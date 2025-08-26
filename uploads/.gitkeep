@@ -1,0 +1,9 @@
+# Uploads Directory
+
+Esta carpeta almacenará archivos subidos durante las diferentes ramas del workshop:
+
+- **Rama 3**: Datasets para fine-tuning
+- **Rama 4**: Archivos de simulación de emails  
+- **Rama 5**: Logs de moderación
+
+Los archivos se gitignorean por seguridad, pero la carpeta se mantiene para estructura.
