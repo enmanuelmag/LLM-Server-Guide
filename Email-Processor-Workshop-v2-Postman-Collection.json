@@ -1,0 +1,912 @@
+{
+  "info": {
+    "name": "Email Processor Workshop v2 - Complete Collection",
+    "description": "Colección completa de endpoints para el Email Processor Workshop v2 - OpenAI API Practitioner.\n\n🎓 **Workshop Overview:**\n- **Rama 1**: Basic Setup - Configuración básica con OpenAI SDK\n- **Rama 2**: RAG Embedding - Implementación RAG con base de datos de emails\n- **Rama 3**: Fine-tuning - Servicio LM con modelos configurables\n- **Rama 4**: Email Processing - Pipeline completo de procesamiento\n- **Rama 5**: Enhanced RAG - RAG mejorado con Function Calling\n- **Rama 6**: API Moderation - Moderación de contenido y seguridad\n\n📚 **Instrucciones de Uso:**\n1. Importa esta colección en Postman\n2. Configura las variables de entorno (baseUrl, port)\n3. Ejecuta los requests según la rama/funcionalidad que estés probando\n4. Revisa las descripciones de cada endpoint para entender su propósito\n\n🔧 **Variables de Entorno:**\n- `baseUrl`: http://localhost\n- `port`: 3000\n\n🚀 **Servidor:**\n```bash\nnpm run dev\n```",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": {
+      "major": 2,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "🏠 Sistema Base",
+      "description": "Endpoints generales del sistema - Disponibles en todas las ramas",
+      "item": [
+        {
+          "name": "Welcome - Información del Workshop",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                ""
+              ]
+            },
+            "description": "🎓 **Endpoint de Bienvenida**\n\n**Propósito:** Información general del workshop, rama actual y endpoints disponibles.\n\n**Rama:** Todas (1-6)\n\n**Respuesta esperada:**\n- Descripción del workshop y rama actual\n- Lista completa de endpoints disponibles\n- Funcionalidades de la rama actual\n- Próximos pasos en el aprendizaje\n\n**Uso:** Punto de inicio para conocer el estado actual del workshop."
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check - Estado del Servidor",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "health"
+              ]
+            },
+            "description": "🩺 **Health Check**\n\n**Propósito:** Verificar que el servidor esté funcionando correctamente.\n\n**Rama:** Todas (1-6)\n\n**Respuesta esperada:**\n- Status: healthy\n- Timestamp actual\n- Versión del sistema\n- Entorno de ejecución\n\n**Uso:** Diagnóstico rápido del estado del servidor."
+          },
+          "response": []
+        },
+        {
+          "name": "Documentación - Guía Completa",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/docs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "docs"
+              ]
+            },
+            "description": "📚 **Documentación Completa**\n\n**Propósito:** Documentación detallada del workshop, ramas y funcionalidades.\n\n**Rama:** Todas (1-6)\n\n**Respuesta incluye:**\n- Descripción completa de cada rama\n- Rutas disponibles por módulo\n- Categorías de moderación (rama 6)\n- Guía de implementación\n\n**Uso:** Referencia técnica completa del workshop."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔤 Rama 1: Basic Setup",
+      "description": "Endpoints básicos - Configuración inicial con OpenAI SDK",
+      "item": [
+        {
+          "name": "Test Basic Completion",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"model\": \"gpt-4o-mini\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a helpful assistant for a financial email processing system.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Explain what a financial email processor should do.\"\n    }\n  ],\n  \"max_tokens\": 200,\n  \"temperature\": 0.7\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/completion",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "completion"
+              ]
+            },
+            "description": "🤖 **Completion Básico**\n\n**Propósito:** Prueba básica de integración con OpenAI SDK.\n\n**Rama:** 1-initial-project\n\n**Datos de entrada:**\n- Model: gpt-4o-mini\n- System prompt para procesamiento de emails financieros\n- User query explicativa\n\n**Respuesta esperada:**\n- Explicación detallada de un procesador de emails financieros\n- Demostración de integración OpenAI básica\n\n**Uso:** Verificar conectividad y configuración inicial."
+          },
+          "response": []
+        },
+        {
+          "name": "Test Basic Query",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"How does the email processor work?\",\n  \"instructions\": [\n    \"Test basic system query\",\n    \"Send POST to /query or /basic\",\n    \"Expected: System explanation or basic processing info\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "query"
+              ]
+            },
+            "description": "❓ **Query Básico**\n\n**Propósito:** Consulta simple al sistema para entender funcionamiento.\n\n**Rama:** 1-initial-project\n\n**Datos de entrada:**\n- Query simple sobre el funcionamiento del sistema\n\n**Respuesta esperada:**\n- Explicación del procesador de emails\n- Información básica del sistema\n\n**Uso:** Interacción básica con el sistema configurado."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔍 Rama 2: RAG Embedding",
+      "description": "Endpoints RAG - Retrieval Augmented Generation con base de datos de emails",
+      "item": [
+        {
+          "name": "RAG Query - Consulta de Políticas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"What is the policy for international wire transfers?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "🔍 **RAG Query - Políticas Financieras**\n\n**Propósito:** Consultar la base de datos de emails usando RAG.\n\n**Rama:** 2-rag-embedding\n\n**Datos de entrada:**\n- Query en lenguaje natural sobre políticas/emails\n\n**Ejemplos de consultas:**\n- \"¿Cuál es la política para transferencias internacionales?\"\n- \"¿Cuánto gasté en Amazon el mes pasado?\"\n- \"¿Qué emails de Netflix tengo?\"\n\n**Respuesta esperada:**\n- Respuesta contextual basada en la base de datos\n- Políticas relevantes encontradas\n- Tokens utilizados\n- Timestamp de procesamiento"
+          },
+          "response": []
+        },
+        {
+          "name": "RAG Query - Consulta de Tarifas",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"¿Cuáles son las tarifas para transferencias internacionales?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "💰 **RAG Query - Tarifas**\n\n**Propósito:** Consultar información específica sobre tarifas y costos.\n\n**Rama:** 2-rag-embedding\n\n**Datos de entrada:**\n- Pregunta específica sobre tarifas en español\n\n**Casos de prueba:**\n- Tarifas internacionales\n- Comisiones bancarias\n- Límites de transferencia\n- Políticas de costos\n\n**Respuesta esperada:**\n- Información detallada sobre tarifas\n- Contexto de políticas relevantes\n- Fuentes de información utilizadas"
+          },
+          "response": []
+        },
+        {
+          "name": "RAG Query - Transferencias Regionales",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"¿Puedo transferir dinero a Europa desde mi cuenta comercial?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "🌍 **RAG Query - Transferencias Regionales**\n\n**Propósito:** Consultar políticas específicas de transferencias regionales.\n\n**Rama:** 2-rag-embedding\n\n**Datos de entrada:**\n- Consulta sobre transferencias a región específica\n- Tipo de cuenta (comercial/personal)\n\n**Casos de prueba:**\n- Transferencias a Europa, Asia, América\n- Diferentes tipos de cuentas\n- Restricciones regionales\n- Límites por zona geográfica\n\n**Respuesta esperada:**\n- Políticas específicas por región\n- Límites y restricciones\n- Procedimientos requeridos"
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Emails/Policies",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/policies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "policies"
+              ]
+            },
+            "description": "📋 **Listar Todas las Políticas/Emails**\n\n**Propósito:** Obtener lista completa de emails/políticas en la base de datos.\n\n**Rama:** 2-rag-embedding (rama 5+ como /rag/emails)\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- Número total de políticas/emails\n- Lista con ID, título, categoría\n- Longitud del contenido\n- Estado de embeddings\n\n**Uso:** Explorar contenido disponible en la base de datos vectorial."
+          },
+          "response": []
+        },
+        {
+          "name": "RAG Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "stats"
+              ]
+            },
+            "description": "📊 **Estadísticas RAG**\n\n**Propósito:** Obtener estadísticas del vector store y base de datos.\n\n**Rama:** 2-rag-embedding\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- Total de políticas/emails\n- Categorías disponibles\n- Dimensión de embeddings\n- Longitud promedio de contenido\n- Modelo OpenAI utilizado\n\n**Uso:** Monitorear estado y configuración del sistema RAG."
+          },
+          "response": []
+        },
+        {
+          "name": "Voice to Text Query (Multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": [],
+                  "description": "Audio file (MP3, WAV, M4A, FLAC) with question in Spanish"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query-voice-to-text",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query-voice-to-text"
+              ]
+            },
+            "description": "🎤🔤 **Voice to Text + RAG**\n\n**Propósito:** Procesar audio, transcribir con Whisper, y ejecutar consulta RAG.\n\n**Rama:** 5-enhanced-rag (con Function Calling)\n\n**Datos de entrada:**\n- Archivo de audio (MP3, WAV, M4A, FLAC)\n- Máximo 25MB\n- Preferiblemente en español\n\n**Ejemplos de preguntas de audio:**\n- \"¿Cuáles son las tarifas para transferencias internacionales?\"\n- \"¿Puedo transferir dinero a Europa desde mi cuenta comercial?\"\n- \"¿Cuál es el límite diario para transferencias electrónicas?\"\n\n**Respuesta esperada:**\n- Transcripción del audio\n- Respuesta RAG basada en transcripción\n- Metadata de procesamiento\n- Tiempo de procesamiento\n\n**Proceso:**\n1. Subir audio → Whisper transcription\n2. Transcripción → RAG query\n3. Respuesta contextual"
+          },
+          "response": []
+        },
+        {
+          "name": "Voice to Voice Query (Multipart)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "audio",
+                  "type": "file",
+                  "src": [],
+                  "description": "Audio file (MP3, WAV, M4A, FLAC) with question"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query-voice-to-voice",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query-voice-to-voice"
+              ]
+            },
+            "description": "🎤🔊 **Voice to Voice Complete**\n\n**Propósito:** Pipeline completo: Audio → Texto → RAG → Audio response.\n\n**Rama:** 5-enhanced-rag (con Function Calling)\n\n**Datos de entrada:**\n- Archivo de audio con pregunta\n- Formatos: MP3, WAV, M4A, FLAC\n- Máximo 25MB\n\n**Respuesta esperada:**\n- **Archivo de audio MP3** con la respuesta\n- Headers con metadata:\n  * X-Transcribed-Query: Pregunta transcrita\n  * X-Response-Length: Longitud de respuesta\n  * X-Relevant-Policies: Políticas relevantes\n  * X-Processing-Timestamp: Timestamp\n\n**Proceso completo:**\n1. Audio → Whisper (transcripción)\n2. Texto → RAG (consulta)\n3. Respuesta → TTS (audio)\n4. Descarga archivo MP3\n\n**Uso:** Interfaz completamente vocal para consultas."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🎯 Rama 3: Fine-tuning",
+      "description": "Endpoints Fine-tuning - Clasificación con LM Service y modelos configurables",
+      "item": [
+        {
+          "name": "Classify Email - Base Model",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailSubject\": \"Payment Receipt - Amazon Purchase\",\n  \"emailBody\": \"Thank you for your purchase! Order #AMZ-789456123. Amount: $45.67. Your credit card ending in 4532 was charged on March 15, 2024.\",\n  \"sender\": \"auto-confirm@amazon.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/fine-tuning/classify-base",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "fine-tuning",
+                "classify-base"
+              ]
+            },
+            "description": "📊 **Clasificación - Modelo Base**\n\n**Propósito:** Clasificar email usando el modelo base configurado en LM Service.\n\n**Rama:** 3-fine-tuning\n\n**Datos de entrada:**\n- emailSubject: Asunto del email\n- emailBody: Cuerpo del mensaje\n- sender: Dirección del remitente (opcional)\n\n**Ejemplos de clasificación:**\n- **Recibo**: Confirmaciones de compra, facturas\n- **Spam**: Emails sospechosos, phishing\n- **Transferencia**: Notificaciones bancarias\n- **Suscripción**: Renovaciones, membresías\n\n**Respuesta esperada:**\n- success: true\n- model: Modelo utilizado\n- classification: Categoría asignada\n- confidence: Nivel de confianza\n- reasoning: Justificación de la clasificación"
+          },
+          "response": []
+        },
+        {
+          "name": "Classify Email - Fine-tuned Model",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailSubject\": \"URGENT: Verify your account now!\",\n  \"emailBody\": \"Your account has been compromised. Click here immediately to verify: http://suspicious-link.com. Act fast!\",\n  \"sender\": \"security@fake-bank.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/fine-tuning/classify-fine-tuned",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "fine-tuning",
+                "classify-fine-tuned"
+              ]
+            },
+            "description": "🎯 **Clasificación - Modelo Fine-tuned**\n\n**Propósito:** Clasificar email usando modelo fine-tuned (educativo - mismo que base).\n\n**Rama:** 3-fine-tuning\n\n**Datos de entrada:**\n- emailSubject: Asunto del email\n- emailBody: Cuerpo del mensaje  \n- sender: Dirección del remitente\n\n**Casos de prueba ideales:**\n- **Spam/Phishing**: URLs sospechosas, urgencia falsa\n- **Transferencias**: Notificaciones bancarias legítimas\n- **Recibos**: Confirmaciones de compra\n- **Estados de cuenta**: Resúmenes financieros\n\n**Respuesta esperada:**\n- Misma estructura que base model\n- En producción: Diferentes resultados vs modelo base\n- Para educación: Demuestra concepto de fine-tuning"
+          },
+          "response": []
+        },
+        {
+          "name": "Compare Models",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"emailSubject\": \"Monthly Statement - Chase Bank\",\n  \"emailBody\": \"Your monthly statement is ready. Account ending in 7890. Total balance: $2,847.50. Download your statement from our secure portal.\",\n  \"sender\": \"statements@chase.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/fine-tuning/compare",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "fine-tuning",
+                "compare"
+              ]
+            },
+            "description": "⚖️ **Comparación de Modelos**\n\n**Propósito:** Comparar resultados entre modelo base y fine-tuned.\n\n**Rama:** 3-fine-tuning\n\n**Datos de entrada:**\n- Email completo para clasificación\n- Mismo formato que endpoints individuales\n\n**Casos ideales para comparación:**\n- **Estados de cuenta**: Documentos financieros oficiales\n- **Transferencias**: Notificaciones bancarias\n- **Spam sofisticado**: Phishing que imita bancos\n- **Recibos complejos**: Múltiples artículos, impuestos\n\n**Respuesta esperada:**\n- Input original\n- Clasificación del modelo\n- Nota educativa sobre fine-tuning\n- En producción: Comparación lado a lado\n\n**Uso:** Demostrar diferencias entre modelos base y entrenados."
+          },
+          "response": []
+        },
+        {
+          "name": "Fine-tuning Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/fine-tuning/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "fine-tuning",
+                "stats"
+              ]
+            },
+            "description": "📈 **Estadísticas de Fine-tuning**\n\n**Propósito:** Obtener estadísticas educativas sobre el proceso de fine-tuning.\n\n**Rama:** 3-fine-tuning\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- Estadísticas del modelo actual\n- Información sobre disponibilidad de modelos\n- Nota educativa sobre fine-tuning\n- Métricas simuladas para aprendizaje\n\n**Información incluye:**\n- Modelo actual en uso\n- Conceptos de fine-tuning\n- Diferencias teóricas entre modelos\n- Consideraciones de producción\n\n**Uso:** Entender el estado del sistema de clasificación."
+          },
+          "response": []
+        },
+        {
+          "name": "Download Training Dataset",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/fine-tuning/dataset",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "fine-tuning",
+                "dataset"
+              ]
+            },
+            "description": "📥 **Descargar Dataset de Entrenamiento**\n\n**Propósito:** Descargar archivo JSONL con datos de entrenamiento para fine-tuning.\n\n**Rama:** 3-fine-tuning\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- **Archivo JSONL** para descarga\n- Content-Type: application/json\n- Content-Disposition: attachment\n- Nombre: email-classification-training.jsonl\n\n**Contenido del archivo:**\n- Ejemplos de entrenamiento en formato OpenAI\n- Diferentes categorías de emails\n- Prompts y completions estructurados\n- Formato listo para fine-tuning API\n\n**Uso:**\n- Entender estructura de datos de entrenamiento\n- Base para crear datasets personalizados\n- Referencia para fine-tuning real"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📧 Rama 4: Email Processing",
+      "description": "Endpoints Email Processing - Pipeline completo de procesamiento de emails",
+      "item": [
+        {
+          "name": "Process Single Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Wire Transfer Confirmation\",\n  \"body\": \"Wire transfer completed successfully. Amount: $5,500.00 sent to John Smith at Wells Fargo. Reference: WT-789456. Fee: $25.00. Date: March 22, 2024.\",\n  \"from\": \"transfers@bankofamerica.com\",\n  \"date\": \"2024-03-22T14:30:00Z\",\n  \"userId\": \"demo-user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/email/process",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "email",
+                "process"
+              ]
+            },
+            "description": "📧 **Procesar Email Individual**\n\n**Propósito:** Procesar un email completo a través del pipeline: clasificación + extracción + guardado.\n\n**Rama:** 4-email-processor\n\n**Datos de entrada:**\n- subject: Asunto del email\n- body: Cuerpo del mensaje\n- from: Remitente (requerido)\n- date: Fecha de recepción (opcional)\n- userId: ID del usuario (opcional, default: 'demo-user')\n\n**Casos de prueba:**\n- **Transferencias**: Notificaciones bancarias\n- **Recibos**: Confirmaciones de compra\n- **Facturas**: Documentos de pago\n- **Suscripciones**: Renovaciones de servicios\n\n**Pipeline completo:**\n1. Clasificación con LM Service\n2. Extracción de datos relevantes\n3. Llamada a Function Calling (save_email)\n4. Almacenamiento de resultado\n\n**Respuesta esperada:**\n- success: true/false\n- processed: true si fue procesado\n- classification: Categoría asignada\n- confidence: Nivel de confianza\n- extractedData: Datos extraídos\n- toolCalls: Funciones llamadas\n- saved: Estado de guardado"
+          },
+          "response": []
+        },
+        {
+          "name": "Simulate Multiple Emails",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"count\": 5,\n  \"userId\": \"demo-user\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/email/simulate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "email",
+                "simulate"
+              ]
+            },
+            "description": "🎲 **Simular Múltiples Emails**\n\n**Propósito:** Generar y procesar múltiples emails simulados para probar el pipeline.\n\n**Rama:** 4-email-processor\n\n**Datos de entrada:**\n- count: Número de emails a simular (1-20)\n- userId: ID del usuario (opcional)\n\n**Proceso de simulación:**\n1. Genera emails aleatorios de diferentes tipos\n2. Los procesa a través del pipeline completo\n3. Devuelve estadísticas de procesamiento\n\n**Tipos de emails simulados:**\n- Recibos de compra (Amazon, tiendas)\n- Notificaciones bancarias (transferencias)\n- Suscripciones (Netflix, servicios)\n- Facturas (servicios, utilidades)\n- Promociones (ofertas, descuentos)\n\n**Respuesta esperada:**\n- simulation.requested: Emails solicitados\n- simulation.processed: Emails procesados exitosamente\n- results.processedEmails: Lista de resultados\n- results.stats: Estadísticas de procesamiento\n\n**Uso:** Probar el sistema con volumen de datos realista."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Processed Email by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/email/processed/email_1234567890",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "email",
+                "processed",
+                "email_1234567890"
+              ]
+            },
+            "description": "🔍 **Obtener Email Procesado por ID**\n\n**Propósito:** Recuperar un email específico que ya fue procesado.\n\n**Rama:** 4-email-processor\n\n**Datos de entrada:**\n- ID del email en la URL (path parameter)\n\n**Formato de ID:**\n- Típicamente: `email_<timestamp>`\n- Ejemplo: `email_1234567890`\n- Se obtiene de respuestas previas de procesamiento\n\n**Respuesta esperada:**\n- success: true si se encuentra\n- email: Objeto completo del email procesado\n  * Datos originales\n  * Clasificación\n  * Datos extraídos\n  * Metadata de procesamiento\n- Error 404 si no se encuentra\n\n**Uso:** Consultar resultados específicos de procesamiento anterior."
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Processed Emails",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/email/processed",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "email",
+                "processed"
+              ]
+            },
+            "description": "📋 **Obtener Todos los Emails Procesados**\n\n**Propósito:** Listar todos los emails que han sido procesados por el sistema.\n\n**Rama:** 4-email-processor\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- success: true\n- total: Número total de emails procesados\n- emails: Array con todos los emails\n  * ID único\n  * Datos originales (subject, body, from)\n  * Clasificación asignada\n  * Datos extraídos\n  * Timestamp de procesamiento\n  * Estado de guardado\n\n**Información útil:**\n- Historial completo de procesamiento\n- Diferentes tipos de clasificaciones\n- Patrones en los datos extraídos\n- Rendimiento del sistema\n\n**Uso:** Análisis y auditoría de emails procesados."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Processing Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/email/stats",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "email",
+                "stats"
+              ]
+            },
+            "description": "📊 **Estadísticas de Procesamiento**\n\n**Propósito:** Obtener métricas y estadísticas del sistema de procesamiento.\n\n**Rama:** 4-email-processor\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Respuesta esperada:**\n- success: true\n- processingStats: Objeto con estadísticas\n  * Número total de emails procesados\n  * Distribución por categorías\n  * Tiempo promedio de procesamiento\n  * Tasa de éxito/fallo\n  * Emails por usuario\n  * Tipos más comunes\n\n**Métricas incluidas:**\n- **Volume**: Total procesado por período\n- **Categories**: Distribución de clasificaciones\n- **Performance**: Tiempos y eficiencia\n- **Users**: Estadísticas por usuario\n- **Success Rate**: Tasa de procesamiento exitoso\n\n**Uso:** Monitoreo y optimización del sistema."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🔧 Rama 5: Enhanced RAG",
+      "description": "Endpoints Enhanced RAG - RAG mejorado con Function Calling y búsqueda inteligente",
+      "item": [
+        {
+          "name": "Enhanced RAG Query",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"¿Cuánto gasté en Amazon durante marzo?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "🧠 **Enhanced RAG con Function Calling**\n\n**Propósito:** RAG mejorado con routing inteligente entre búsqueda vectorial y estructurada.\n\n**Rama:** 5-enhanced-rag (fetch-emails)\n\n**Datos de entrada:**\n- query: Consulta en lenguaje natural\n\n**Funcionalidades mejoradas:**\n- **Routing inteligente**: Vector vs búsqueda estructurada\n- **Function Calling**: search_emails_by_sender, search_emails_by_amount, etc.\n- **Contexto mejorado**: Mejor comprensión de queries\n- **Respuestas precisas**: Datos específicos vs información general\n\n**Ejemplos optimizados:**\n- \"¿Cuánto gasté en Amazon?\"\n- \"Emails de netflix@netflix.com\"\n- \"Compras superiores a $100\"\n- \"¿Qué emails recibí ayer?\"\n\n**Respuesta esperada:**\n- Routing decision (vector vs structured)\n- Function calls ejecutadas\n- Resultados precisos con datos específicos\n- Metadata de procesamiento mejorada"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Emails by Sender",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Mostrame todos los emails de billing@netflix.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "👤 **Búsqueda por Remitente**\n\n**Propósito:** Usar Function Calling para buscar emails de remitente específico.\n\n**Rama:** 5-enhanced-rag\n\n**Datos de entrada:**\n- Query mencionando remitente específico\n\n**Function Calling esperado:**\n- search_emails_by_sender(sender: \"billing@netflix.com\")\n- Búsqueda estructurada en lugar de vectorial\n\n**Casos de prueba:**\n- \"billing@netflix.com\" → Suscripciones Netflix\n- \"no-reply@amazon.com\" → Compras Amazon\n- \"service@walmart.com\" → Compras Walmart\n- \"notifications@uber.com\" → Servicios Uber\n\n**Respuesta esperada:**\n- Lista específica de emails del remitente\n- Metadata de cada email\n- Routing decision hacia structured search"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Emails by Amount",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"¿Qué compras hice por más de $100?\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/query",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "query"
+              ]
+            },
+            "description": "💰 **Búsqueda por Monto**\n\n**Propósito:** Function Calling para filtrar emails por rango de montos.\n\n**Rama:** 5-enhanced-rag\n\n**Datos de entrada:**\n- Query mencionando montos o rangos específicos\n\n**Function Calling esperado:**\n- search_emails_by_amount(min_amount: 100)\n- search_emails_by_amount(max_amount: 50)\n- search_emails_by_amount(min_amount: 100, max_amount: 500)\n\n**Casos de prueba:**\n- \"más de $100\" → emails con montos > $100\n- \"menos de $50\" → emails con montos < $50\n- \"entre $50 y $200\" → emails en rango específico\n- \"exactamente $129.99\" → monto específico\n\n**Respuesta esperada:**\n- Emails filtrados por criterio de monto\n- Montos destacados en la respuesta\n- Suma total de gastos si aplica"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Email Database List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/rag/emails",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "rag",
+                "emails"
+              ]
+            },
+            "description": "📧 **Lista de Emails en Base de Datos**\n\n**Propósito:** Listar todos los emails disponibles en la base de datos.\n\n**Rama:** 5-enhanced-rag (endpoint actualizado de /policies)\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Base de datos incluye:**\n- **Walmart**: $87.34 - Groceries\n- **Amazon**: $129.99 - Electronics\n- **Netflix**: $15.99 - Subscription\n- **Starbucks**: $12.45 - Coffee\n- **Uber**: $23.67 - Transportation\n- **Best Buy**: $299.00 - Electronics\n- **Target**: $45.78 - Household items\n- **Apple**: $0.99 - App purchase\n\n**Respuesta esperada:**\n- Lista completa de 8 emails\n- ID, subject, amount, sender por email\n- Metadata de embeddings\n- Categorización por tipo\n\n**Uso:** Explorar datos disponibles para testing."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🛡️ Rama 6: API Moderation",
+      "description": "Endpoints Moderation - Filtrado de contenido y evaluación de seguridad",
+      "item": [
+        {
+          "name": "Moderate Text Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"I want to check my account balance and recent transactions for any unauthorized charges.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/api/moderation/text",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "moderation",
+                "text"
+              ]
+            },
+            "description": "🛡️ **Moderación de Texto**\n\n**Propósito:** Evaluar contenido de texto usando OpenAI Moderation API.\n\n**Rama:** 6-api-moderation\n\n**Datos de entrada:**\n- text: Contenido a moderar (string)\n\n**Casos de prueba:**\n- **Contenido seguro**: Consultas financieras normales\n- **Contenido problemático**: Lenguaje ofensivo, amenazas\n- **Contenido límite**: Frustración expresada apropiadamente\n\n**Categorías evaluadas:**\n- harassment: Acoso o hostigamiento\n- hate: Contenido discriminatorio\n- self-harm: Autolesiones\n- sexual: Contenido sexual\n- violence: Violencia\n- harassment/threatening: Acoso con amenazas\n\n**Respuesta esperada:**\n- moderation: Resultado completo de OpenAI\n- analysis: Análisis interpretado\n  * risk_level: low/medium/high\n  * flagged: true/false\n  * highest_scores: Categorías más problemáticas\n- input_length: Longitud del texto"
+          },
+          "response": []
+        },
+        {
+          "name": "Moderate Email Content",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Monthly Statement Available\",\n  \"body\": \"Your monthly statement is now available. Please log into your secure account to view your transactions and balance information.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/api/moderation/email",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "moderation",
+                "email"
+              ]
+            },
+            "description": "📧 **Moderación de Email**\n\n**Propósito:** Moderar tanto asunto como cuerpo del email por separado.\n\n**Rama:** 6-api-moderation\n\n**Datos de entrada:**\n- subject: Asunto del email (requerido)\n- body: Cuerpo del email (requerido)\n\n**Casos de prueba:**\n- **Email legítimo**: Notificaciones bancarias oficiales\n- **Phishing**: Asuntos urgentes, cuerpos con links sospechosos\n- **Spam**: Ofertas excesivas, lenguaje promocional agresivo\n- **Contenido problemático**: Lenguaje inapropiado en comunicaciones\n\n**Evaluación separada:**\n- Subject moderation: Análisis del asunto\n- Body moderation: Análisis del cuerpo\n- Overall assessment: Evaluación general\n\n**Respuesta esperada:**\n- email_safe: Evaluación general (true/false)\n- subject: Moderación y análisis del asunto\n- body: Moderación y análisis del cuerpo\n- overall: Recomendación final y nivel de riesgo"
+          },
+          "response": []
+        },
+        {
+          "name": "Batch Text Moderation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"texts\": [\n    \"I need to transfer money to my savings account.\",\n    \"This service is terrible and I hate dealing with your company.\",\n    \"Can you help me understand my recent charges?\",\n    \"URGENT: Click here now or your account will be closed!\",\n    \"Thank you for your excellent customer service.\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/api/moderation/batch",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "moderation",
+                "batch"
+              ]
+            },
+            "description": "📦 **Moderación por Lotes**\n\n**Propósito:** Moderar múltiples textos en una sola solicitud.\n\n**Rama:** 6-api-moderation\n\n**Datos de entrada:**\n- texts: Array de strings (máximo 10)\n\n**Validaciones:**\n- Array requerido\n- Mínimo 1 texto\n- Máximo 10 textos\n- Todos deben ser strings\n\n**Casos de prueba variados:**\n- Mezcla de contenido seguro y problemático\n- Diferentes niveles de riesgo\n- Varios tipos de comunicación financiera\n\n**Respuesta esperada:**\n- results: Array con moderación individual\n- summary: Estadísticas agregadas\n  * total: Número de textos\n  * flagged: Textos marcados\n  * clean: Textos seguros\n  * Distribución por nivel de riesgo\n\n**Uso:** Procesamiento eficiente de múltiples contenidos."
+          },
+          "response": []
+        },
+        {
+          "name": "Moderation Demo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"include_risky\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/api/moderation/demo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "moderation",
+                "demo"
+              ]
+            },
+            "description": "🎭 **Demo de Moderación**\n\n**Propósito:** Demostrar el sistema de moderación con ejemplos predefinidos.\n\n**Rama:** 6-api-moderation\n\n**Datos de entrada:**\n- include_risky: Incluir ejemplos de contenido problemático (opcional, default: false)\n\n**Ejemplos seguros incluidos:**\n- Newsletter welcome message\n- Account suspension warning\n- Purchase confirmation\n- Promotional offer\n- Feedback acknowledgment\n\n**Ejemplos problemáticos (include_risky: true):**\n- Contenido de autolesión (educativo)\n- Críticas agresivas (límite)\n- Otros casos límite para aprendizaje\n\n**Respuesta esperada:**\n- demo_results: Array con texto, moderación y análisis\n- summary: Estadísticas generales\n- educational_note: Nota sobre el propósito educativo\n\n**Uso:** Entender el comportamiento de la Moderation API con ejemplos reales."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Moderation Categories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}:{{port}}/api/moderation/categories",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "moderation",
+                "categories"
+              ]
+            },
+            "description": "📚 **Categorías de Moderación**\n\n**Propósito:** Obtener información detallada sobre todas las categorías de moderación.\n\n**Rama:** 6-api-moderation\n\n**Datos de entrada:** Ninguno (GET request)\n\n**Categorías incluidas:**\n- **harassment**: Lenguaje de acoso\n- **harassment/threatening**: Acoso con amenazas\n- **hate**: Contenido discriminatorio\n- **hate/threatening**: Odio con violencia\n- **self-harm**: Autolesiones\n- **self-harm/intent**: Intención de autolesión\n- **self-harm/instructions**: Instrucciones de autolesión\n- **sexual**: Contenido sexual\n- **sexual/minors**: Contenido sexual con menores\n- **violence**: Violencia\n- **violence/graphic**: Violencia gráfica\n\n**Información adicional:**\n- Descripción detallada de cada categoría\n- Notas de uso\n- Rangos de puntuación (0.0 - 1.0)\n- Criterios de flagging\n\n**Uso:** Referencia para interpretar resultados de moderación."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost",
+      "description": "Base URL del servidor"
+    },
+    {
+      "key": "port",
+      "value": "3000",
+      "description": "Puerto del servidor (configurable en .env)"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Pre-request script para logging",
+          "console.log('🚀 Ejecutando request:', pm.info.requestName);",
+          "console.log('📍 URL:', pm.request.url.toString());",
+          "",
+          "// Verificar variables de entorno",
+          "if (!pm.environment.get('baseUrl')) {",
+          "    pm.environment.set('baseUrl', 'http://localhost');",
+          "}",
+          "if (!pm.environment.get('port')) {",
+          "    pm.environment.set('port', '3000');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Tests globales para validación básica",
+          "pm.test('Status code is 200 or 201', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+          "});",
+          "",
+          "pm.test('Response time is less than 30 seconds', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(30000);",
+          "});",
+          "",
+          "pm.test('Response is JSON', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});",
+          "",
+          "// Log de respuesta para debugging",
+          "if (pm.response.code >= 400) {",
+          "    console.log('❌ Error response:', pm.response.text());",
+          "} else {",
+          "    console.log('✅ Success response received');",
+          "}"
+        ]
+      }
+    }
+  ]
+}
