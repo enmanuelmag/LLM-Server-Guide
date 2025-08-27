@@ -1,29 +1,15 @@
 {
-  "query": "Explain what a financial email processor should do and what features it should have.",
-  "instructions": [
-    "Test basic OpenAI completion in workshop",
-    "For rama 1: This tests the basic OpenAI SDK integration",
-    "Expected: JSON response with system explanation",
-    "Note: In rama 1, you would create a test endpoint to handle this"
+  "model": "gpt-4o-mini",
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are a helpful assistant for a financial email processing system."
+    },
+    {
+      "role": "user",
+      "content": "Explain what a financial email processor should do."
+    }
   ],
-  "endpoint": {
-    "method": "POST",
-    "url": "/test-openai",
-    "description": "Basic OpenAI completion test endpoint"
-  },
-  "samplePayload": {
-    "model": "gpt-4o-mini",
-    "messages": [
-      {
-        "role": "system", 
-        "content": "You are a helpful assistant for a financial email processing system."
-      },
-      {
-        "role": "user",
-        "content": "Explain what a financial email processor should do."
-      }
-    ],
-    "max_tokens": 200,
-    "temperature": 0.7
-  }
+  "max_tokens": 200,
+  "temperature": 0.7
 }
