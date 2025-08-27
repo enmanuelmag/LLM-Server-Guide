@@ -14,24 +14,27 @@ Construir un sistema de procesamiento de emails financieros que evoluciona a tra
 - ✅ Estructura base con Express y TypeScript
 
 ### Rama 2: `2-rag-embedding`
-- 🔄 Implementación de RAG con Company Financial Policies
-- 🔄 Vector store en memoria
-- 🔄 Endpoint para consultas contextualizadas
+- ✅ Implementación de RAG con Company Financial Policies
+- ✅ Vector store en memoria
+- ✅ Endpoint para consultas contextualizadas
 
 ### Rama 3: `3-fine-tuning`
-- 📋 Fine-tuning con LoRA para clasificación de emails
-- 📋 Generación de dataset de entrenamiento
-- 📋 Comparación modelo base vs fine-tuned
+- ✅ LMService para clasificación de emails (reemplaza FineTuningService)
+- ✅ Generación de dataset de entrenamiento
+- ✅ Configuración flexible con OPENAI_MODEL
+- ✅ Comparación modelo base vs fine-tuned
 
 ### Rama 4: `4-email-processor`
-- 📋 Simulación completa de procesamiento de emails
-- 📋 Tool calling para save-email
-- 📋 Preservación de lógica de senders existente
+- ✅ Simulación completa de procesamiento de emails
+- ✅ Tool calling para save-email
+- ✅ Arquitectura modular con routes/ separados
+- ✅ Preservación de lógica de senders existente
 
 ### Rama 5: `5-api-moderation`
-- 📋 Integración de Moderation API
-- 📋 Filtrado de contenido inapropiado
-- 📋 Sistema completo y robusto
+- ✅ Integración de Moderation API
+- ✅ Filtrado de contenido inapropiado
+- ✅ Sistema completo y robusto
+- ✅ Arquitectura final con todos los módulos
 
 ## 🚀 Instalación y Setup
 
@@ -56,6 +59,17 @@ npm run dev
 - **Práctico**: Ejemplos reales con casos de uso financieros
 - **Progresivo**: De conceptos simples a implementaciones complejas
 - **Certificación-aligned**: Cubre todos los temas de OpenAI API Practitioner
+- **Arquitectura Modular**: Routes separados y servicios desacoplados
+- **Documentación Completa**: Guía detallada con costos y mejores prácticas
+
+## 🔧 Mejoras Implementadas
+
+- **LMService Refactoring**: Reemplazo de FineTuningService con configuración flexible
+- **Modular Routes**: Separación de endpoints en archivos dedicados
+- **Enhanced Documentation**: Explicaciones detalladas de embeddings y fine-tuning
+- **OpenAI Platform Integration**: Pasos específicos para fine-tuning en plataforma
+- **Moderation API**: Explicación completa de seguridad de contenido
+- **Environment Configuration**: Variables flexibles para diferentes modelos
 
 ## 📖 Guía de Uso
 
