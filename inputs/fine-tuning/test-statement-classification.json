@@ -1,0 +1,30 @@
+{
+  "email": {
+    "subject": "Monthly Statement Available",
+    "content": "Your Chase credit card statement for March 2024 is now available. Total balance: $1,247.89. Minimum payment due: $35.00 by April 15, 2024.",
+    "sender": "statements@chase.com"
+  },
+  "instructions": [
+    "Test statement classification and data extraction",
+    "Send POST to /fine-tuning/classify-base for basic classification",
+    "Send POST to /fine-tuning/classify-fine-tuned for enhanced classification",
+    "Use /fine-tuning/compare to see improvement in accuracy and detail extraction"
+  ],
+  "endpoints": {
+    "baseModel": "/fine-tuning/classify-base",
+    "fineTunedModel": "/fine-tuning/classify-fine-tuned",
+    "comparison": "/fine-tuning/compare", 
+    "trainingData": "/fine-tuning/training-data"
+  },
+  "expectedResponse": {
+    "classification": "statement",
+    "confidence": 0.98,
+    "extractedData": {
+      "totalBalance": "$1,247.89",
+      "minimumPayment": "$35.00", 
+      "dueDate": "April 15, 2024",
+      "statementPeriod": "March 2024"
+    },
+    "reasoning": "Official statement from legitimate bank with financial details"
+  }
+}
