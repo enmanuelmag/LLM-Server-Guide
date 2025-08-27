@@ -1,0 +1,19 @@
+{
+  "emails": [
+    {
+      "subject": "Netflix Subscription Renewal",
+      "content": "Your Netflix subscription has been renewed. Amount charged: $15.49 to card ending in 1234. Next billing date: April 15, 2024.",
+      "sender": "billing@netflix.com"
+    },
+    {
+      "subject": "Grocery Receipt - Whole Foods",
+      "content": "Thank you for shopping with us! Total: $127.83. Items: Organic vegetables, Greek yogurt, Salmon fillet. Date: March 20, 2024.",
+      "sender": "receipts@wholefoods.com"
+    }
+  ],
+  "instructions": [
+    "Test batch email processing",
+    "Send POST to /email-processing/process-batch",
+    "Expected: Multiple emails processed with classifications and saved data"
+  ]
+}

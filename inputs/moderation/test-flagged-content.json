@@ -1,0 +1,8 @@
+{
+  "content": "I hate this stupid bank! Their customer service is terrible and I want to hurt someone because of their incompetence!",
+  "instructions": [
+    "Test potentially harmful content",
+    "Send POST to /moderation/check-content", 
+    "Expected: Content flagged for violence/hate categories"
+  ]
+}

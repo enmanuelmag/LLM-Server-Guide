@@ -1,0 +1,12 @@
+{
+  "email": {
+    "subject": "URGENT: Account Security Alert",
+    "content": "We detected suspicious activity on your account. Please verify your identity by clicking this link and entering your credentials immediately.",
+    "sender": "security-alert@suspicious-bank.com"
+  },
+  "instructions": [
+    "Test spam/phishing detection",
+    "Send POST to /fine-tuning/classify-email", 
+    "Expected: Classification as 'spam' or 'security_alert' with explanation"
+  ]
+}

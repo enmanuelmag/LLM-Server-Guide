@@ -1,0 +1,12 @@
+{
+  "email": {
+    "subject": "Payment Receipt - Amazon Purchase",
+    "content": "Thank you for your purchase! Order #AMZ-789456123. Amount: $45.67. Your credit card ending in 4532 was charged on March 15, 2024.",
+    "sender": "auto-confirm@amazon.com"
+  },
+  "instructions": [
+    "Test email classification",
+    "Send POST to /fine-tuning/classify-email",
+    "Expected: Classification as 'receipt' with high confidence"
+  ]
+}

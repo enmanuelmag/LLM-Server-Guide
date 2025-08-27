@@ -1,0 +1,12 @@
+{
+  "email": {
+    "subject": "Wire Transfer Confirmation",
+    "content": "Wire transfer completed successfully. Amount: $5,500.00 sent to John Smith at Wells Fargo. Reference: WT-789456. Fee: $25.00. Date: March 22, 2024.",
+    "sender": "transfers@bankofamerica.com"
+  },
+  "instructions": [
+    "Test single email with tool calling",
+    "Send POST to /email-processing/process-single",
+    "Expected: Email classified, data extracted, and save-email tool called"
+  ]
+}

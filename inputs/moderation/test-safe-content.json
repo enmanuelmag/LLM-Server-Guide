@@ -1,0 +1,8 @@
+{
+  "content": "I want to check my account balance and recent transactions for any unauthorized charges.",
+  "instructions": [
+    "Test normal financial content",
+    "Send POST to /moderation/check-content",
+    "Expected: Content approved with low flagged scores"
+  ]
+}

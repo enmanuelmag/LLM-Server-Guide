@@ -1,0 +1,12 @@
+{
+  "email": {
+    "subject": "Monthly Statement Available",
+    "content": "Your Chase credit card statement for March 2024 is now available. Total balance: $1,247.89. Minimum payment due: $35.00 by April 15, 2024.",
+    "sender": "statements@chase.com"
+  },
+  "instructions": [
+    "Test statement classification",
+    "Send POST to /fine-tuning/classify-email",
+    "Expected: Classification as 'statement' with extracted amounts"
+  ]
+}
