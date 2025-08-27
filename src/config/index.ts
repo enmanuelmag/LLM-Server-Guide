@@ -1,9 +1,13 @@
+import dotenv from 'dotenv';
 import { AppConfig } from '../types/config';
+
+// Load environment variables from .env file
+dotenv.config();
 
 export const config: AppConfig = {
   openai: {
     apiKey: process.env.OPENAI_API_KEY || '',
-    model: 'gpt-4o-mini',
+    model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
     embeddingModel: 'text-embedding-3-small',
   },
   server: {
