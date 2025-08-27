@@ -1,0 +1,56 @@
+{
+  "emails": [
+    {
+      "subject": "Netflix Subscription Renewal",
+      "content": "Your Netflix subscription has been renewed. Amount charged: $15.49 to card ending in 1234. Next billing date: April 15, 2024.",
+      "sender": "billing@netflix.com"
+    },
+    {
+      "subject": "Grocery Receipt - Whole Foods", 
+      "content": "Thank you for shopping with us! Total: $127.83. Items: Organic vegetables, Greek yogurt, Salmon fillet. Date: March 20, 2024.",
+      "sender": "receipts@wholefoods.com"
+    }
+  ],
+  "instructions": [
+    "Test batch email processing pipeline",
+    "Send POST to /email/process",
+    "Expected: Multiple emails processed with classifications, extractions, and saved data",
+    "This tests the complete email processing workflow with RAG + Fine-tuning"
+  ],
+  "endpoint": {
+    "method": "POST", 
+    "url": "/email/process",
+    "description": "Complete email processing pipeline with classification and data extraction"
+  },
+  "alternativeEndpoint": {
+    "method": "POST",
+    "url": "/email/simulate", 
+    "description": "Email simulation for testing without real processing"
+  },
+  "expectedResponse": {
+    "success": true,
+    "processedEmails": 2,
+    "results": [
+      {
+        "classification": "subscription",
+        "confidence": 0.92,
+        "extractedData": {
+          "amount": "$15.49",
+          "service": "Netflix",
+          "nextBilling": "April 15, 2024"
+        },
+        "saved": true
+      },
+      {
+        "classification": "receipt",
+        "confidence": 0.95,
+        "extractedData": {
+          "total": "$127.83",
+          "merchant": "Whole Foods",
+          "date": "March 20, 2024"
+        },
+        "saved": true
+      }
+    ]
+  }
+}

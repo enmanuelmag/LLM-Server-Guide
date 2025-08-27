@@ -1,0 +1,8 @@
+{
+  "query": "What is the policy for international wire transfers?",
+  "instructions": [
+    "Test RAG query with company policies",
+    "Send POST to /rag/query",
+    "Expected: Contextual response based on financial policies"
+  ]
+}
