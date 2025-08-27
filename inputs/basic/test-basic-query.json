@@ -1,0 +1,24 @@
+{
+  "query": "I need help understanding my latest bank statement and want to find all transactions over $500 from last month.",
+  "instructions": [
+    "Test basic financial query processing",
+    "For rama 1: Send POST request to basic completion endpoint",
+    "Expected: JSON response with AI-generated help",
+    "This simulates the foundation before RAG is implemented"
+  ],
+  "endpoint": {
+    "method": "GET",
+    "url": "/",
+    "description": "Workshop overview endpoint - always available"
+  },
+  "alternativeTest": {
+    "method": "GET", 
+    "url": "/health",
+    "description": "Health check - verify system is running"
+  },
+  "expectedResponse": {
+    "status": "healthy",
+    "message": "Email Processor Workshop running",
+    "currentBranch": "1-initial-project"
+  }
+}
