@@ -5,8 +5,25 @@
     "sender": "security-alert@suspicious-bank.com"
   },
   "instructions": [
-    "Test spam/phishing detection",
-    "Send POST to /fine-tuning/classify-email", 
-    "Expected: Classification as 'spam' or 'security_alert' with explanation"
-  ]
+    "Test spam/phishing detection capabilities",
+    "Send POST to /fine-tuning/classify-base for base model classification",
+    "Send POST to /fine-tuning/classify-fine-tuned for specialized classification", 
+    "Use /fine-tuning/compare to see how fine-tuning improves detection"
+  ],
+  "endpoints": {
+    "baseModel": "/fine-tuning/classify-base",
+    "fineTunedModel": "/fine-tuning/classify-fine-tuned",
+    "comparison": "/fine-tuning/compare"
+  },
+  "expectedResponse": {
+    "baseModel": {
+      "classification": "suspicious",
+      "confidence": 0.75
+    },
+    "fineTunedModel": {
+      "classification": "spam",
+      "confidence": 0.92,
+      "reasoning": "Suspicious sender domain, urgent language, credential harvesting attempt"
+    }
+  }
 }

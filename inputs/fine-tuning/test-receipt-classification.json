@@ -5,8 +5,20 @@
     "sender": "auto-confirm@amazon.com"
   },
   "instructions": [
-    "Test email classification",
-    "Send POST to /fine-tuning/classify-email",
-    "Expected: Classification as 'receipt' with high confidence"
-  ]
+    "Test email classification with base model",
+    "Send POST to /fine-tuning/classify-base",
+    "Expected: Classification as 'receipt' with confidence score",
+    "Alternative: Use /fine-tuning/compare to see base vs fine-tuned comparison"
+  ],
+  "endpoints": {
+    "baseModel": "/fine-tuning/classify-base",
+    "fineTunedModel": "/fine-tuning/classify-fine-tuned", 
+    "comparison": "/fine-tuning/compare"
+  },
+  "expectedResponse": {
+    "success": true,
+    "classification": "receipt",
+    "confidence": 0.95,
+    "reasoning": "Email contains purchase confirmation with order number and payment details"
+  }
 }
