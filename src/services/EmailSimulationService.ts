@@ -90,7 +90,7 @@ Shipping: Free
 Tax: $${faker.finance.amount({ min: 5, max: 25, dec: 2 })}
 
 Your order will be processed within 1-2 business days.
-Estimated delivery: ${faker.date.future({ days: 7 }).toLocaleDateString()}
+Estimated delivery: ${faker.date.future().toLocaleDateString()}
 
 Track your order at: https://${sender.email.split('@')[1]}/track/${orderNumber}
 
@@ -112,7 +112,7 @@ Thank you for choosing ${sender.name}!`,
       'Premium',
       'Enterprise',
     ]);
-    const renewalDate = faker.date.future({ days: 30 });
+    const renewalDate = faker.date.future();
 
     return {
       id: faker.string.uuid(),
