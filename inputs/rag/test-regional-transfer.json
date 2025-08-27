@@ -1,0 +1,8 @@
+{
+  "query": "Can I transfer money to my business account in Europe?",
+  "instructions": [
+    "Test regional transfer policies",
+    "Send POST to /rag/query",
+    "Expected: Policy-based response about European transfers"
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "content": "I want to check my account balance and recent transactions for any unauthorized charges.",
+  "instructions": [
+    "Test normal financial content moderation",
+    "Send POST to /api/moderation/check-content",
+    "Expected: Content approved with low flagged scores",
+    "This demonstrates safe content passing moderation filters"
+  ],
+  "endpoint": {
+    "method": "POST",
+    "url": "/api/moderation/check-content",
+    "description": "OpenAI Moderation API integration"
+  },
+  "expectedResponse": {
+    "success": true,
+    "flagged": false,
+    "categories": {
+      "hate": false,
+      "harassment": false,
+      "self-harm": false,
+      "sexual": false,
+      "violence": false
+    },
+    "categoryScores": {
+      "hate": 0.001,
+      "harassment": 0.002,
+      "violence": 0.001
+    },
+    "message": "Content passed moderation screening"
+  }
+}
