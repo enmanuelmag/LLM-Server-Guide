@@ -18,6 +18,8 @@ export const config: AppConfig = {
 
 // Validation
 if (!config.openai.apiKey) {
-  console.error('❌ Error: OPENAI_API_KEY is required in environment variables');
+  console.error(
+    '❌ Error: OPENAI_API_KEY is required in environment variables'
+  );
   process.exit(1);
 }
