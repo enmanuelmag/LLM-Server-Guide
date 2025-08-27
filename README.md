@@ -49,8 +49,27 @@ npm install
 cp .env.example .env
 # Editar .env con tu OPENAI_API_KEY
 
-# 4. Ejecutar en modo desarrollo
+# 4. Verificar setup
+npm run build
+
+# 5. Ejecutar en modo desarrollo
 npm run dev
+
+# 6. Probar endpoints (opcional)
+curl http://localhost:3000/health
+```
+
+## 🧪 Testing con Datos de Ejemplo
+
+```bash
+# Usar datos de prueba incluidos
+curl -X POST http://localhost:3000/rag/query \
+  -H "Content-Type: application/json" \
+  -d @inputs/rag/test-policy-query.json
+
+# Para testing de audio (Rama 2+)
+curl -X POST http://localhost:3000/rag/query-voice-to-text \
+  -F "audio=@tu-pregunta.mp3"
 ```
 
 ## 🌟 Características del Workshop
@@ -61,6 +80,28 @@ npm run dev
 - **Certificación-aligned**: Cubre todos los temas de OpenAI API Practitioner
 - **Arquitectura Modular**: Routes separados y servicios desacoplados
 - **Documentación Completa**: Guía detallada con costos y mejores prácticas
+- **Voice Capabilities**: Interacciones por voz con Whisper y TTS
+- **Testing Comprehensive**: Datos de prueba organizados y listos para usar
+
+## 🎤 Funcionalidades de Voz (Rama 2+)
+
+### Speech-to-Text + RAG
+```bash
+POST /rag/query-voice-to-text
+# Sube MP3/WAV → Transcribe → Consulta RAG → Responde JSON
+```
+
+### Voice-to-Voice RAG  
+```bash
+POST /rag/query-voice-to-voice
+# Sube audio → Transcribe → Consulta RAG → Responde audio MP3
+```
+
+**Casos de uso reales:**
+- 🚗 CFO consulta desde el coche
+- 📱 Consultas móviles por voz
+- ♿ Accesibilidad mejorada
+- 🎧 Respuestas mientras trabajas
 
 ## 🔧 Mejoras Implementadas
 
@@ -70,6 +111,25 @@ npm run dev
 - **OpenAI Platform Integration**: Pasos específicos para fine-tuning en plataforma
 - **Moderation API**: Explicación completa de seguridad de contenido
 - **Environment Configuration**: Variables flexibles para diferentes modelos
+- **Voice Capabilities**: Endpoints de voz con Whisper y TTS integration
+- **Comprehensive Testing**: Datos de prueba organizados para cada funcionalidad
+
+## 📁 Estructura de Testing
+
+```
+inputs/                     # 🧪 Datos de prueba para cada rama
+├── basic/                 # Rama 1: Setup básico y OpenAI calls
+├── rag/                   # Rama 2: RAG queries + Voice endpoints  
+├── fine-tuning/          # Rama 3: Clasificación especializada
+├── email-processing/     # Rama 4: Pipeline completo
+└── moderation/           # Rama 5: Filtrado de contenido
+```
+
+**Cada carpeta incluye:**
+- ✅ Archivos JSON listos para Postman/cURL
+- ✅ Instrucciones detalladas de uso
+- ✅ Expected results para validación
+- ✅ Ejemplos progresivos por funcionalidad
 
 ## 📖 Guía de Uso
 
