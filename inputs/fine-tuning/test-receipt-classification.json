@@ -1,0 +1,24 @@
+{
+  "email": {
+    "subject": "Payment Receipt - Amazon Purchase",
+    "content": "Thank you for your purchase! Order #AMZ-789456123. Amount: $45.67. Your credit card ending in 4532 was charged on March 15, 2024.",
+    "sender": "auto-confirm@amazon.com"
+  },
+  "instructions": [
+    "Test email classification with base model",
+    "Send POST to /fine-tuning/classify-base",
+    "Expected: Classification as 'receipt' with confidence score",
+    "Alternative: Use /fine-tuning/compare to see base vs fine-tuned comparison"
+  ],
+  "endpoints": {
+    "baseModel": "/fine-tuning/classify-base",
+    "fineTunedModel": "/fine-tuning/classify-fine-tuned", 
+    "comparison": "/fine-tuning/compare"
+  },
+  "expectedResponse": {
+    "success": true,
+    "classification": "receipt",
+    "confidence": 0.95,
+    "reasoning": "Email contains purchase confirmation with order number and payment details"
+  }
+}

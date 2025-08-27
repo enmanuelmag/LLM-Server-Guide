@@ -1,0 +1,35 @@
+{
+  "instructions": [
+    "Audio to Text Query Test",
+    "1. Create a voice message asking: '¿Cuáles son las tarifas para transferencias internacionales?'",
+    "2. Save as MP3, WAV, or M4A format",
+    "3. Send POST to /rag/query-voice-to-text with audio file as 'audio' field",
+    "4. Expected: JSON response with transcription and RAG answer"
+  ],
+  "endpoints": {
+    "url": "/rag/query-voice-to-text",
+    "method": "POST",
+    "contentType": "multipart/form-data",
+    "field": "audio"
+  },
+  "sampleQueries": [
+    "¿Cuáles son las tarifas para transferencias internacionales?",
+    "¿Puedo transferir dinero a Europa desde mi cuenta comercial?",
+    "¿Cuál es el límite diario para transferencias electrónicas?"
+  ],
+  "expectedResponse": {
+    "success": true,
+    "transcription": {
+      "originalAudio": "query.mp3",
+      "transcribedText": "¿Cuáles son las tarifas para transferencias internacionales?",
+      "audioSize": 45678,
+      "processingTime": 1672531200000
+    },
+    "ragResponse": {
+      "query": "¿Cuáles son las tarifas para transferencias internacionales?", 
+      "answer": "Based on company policies...",
+      "relevantPolicies": 3,
+      "tokensUsed": 256
+    }
+  }
+}

@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
 import { AppConfig } from '../types/config';
+
+// Load environment variables from .env file
+dotenv.config();
 
 export const config: AppConfig = {
   openai: {
