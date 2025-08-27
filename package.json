@@ -6,8 +6,9 @@
   "scripts": {
     "build": "tsc && tsc-alias && ts-add-js-extension --dir=dist",
     "dev": "ts-node src/app.ts",
-    "start": "node dist/app.ts",
-    "clean": "rm -rf dist"
+    "start": "node dist/app.js",
+    "clean": "rm -rf dist",
+    "test:env": "ts-node src/tests/test-env.ts"
   },
   "keywords": [
     "openai",
