@@ -1,0 +1,8 @@
+{
+  "input": "I need help understanding my latest bank statement and want to find all transactions over $500 from last month.",
+  "instructions": [
+    "Use this to test basic OpenAI completion",
+    "Send POST request to /test-openai",
+    "Expected: JSON response with OpenAI completion"
+  ]
+}
