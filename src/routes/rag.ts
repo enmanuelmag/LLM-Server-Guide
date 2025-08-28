@@ -47,7 +47,7 @@ router.post('/query', async (req, res) => {
       query,
       answer: result.answer,
       metadata: {
-        relevantPolicies: result.relevantPolicies,
+        relevantEmails: result.relevantEmails,
         tokensUsed: result.tokensUsed,
         timestamp: new Date().toISOString()
       }
@@ -103,7 +103,7 @@ router.post('/query-voice-to-text', upload.single('audio'), async (req, res) => 
       ragResponse: {
         query: transcribedText,
         answer: result.answer,
-        relevantPolicies: result.relevantPolicies,
+        relevantEmails: result.relevantEmails,
         tokensUsed: result.tokensUsed
       },
       timestamp: new Date().toISOString()
@@ -176,7 +176,7 @@ router.post('/query-voice-to-voice', upload.single('audio'), async (req, res) =>
       'Content-Disposition': `attachment; filename="rag-response-${Date.now()}.mp3"`,
       'X-Transcribed-Query': transcribedText,
       'X-Response-Length': result.answer.length.toString(),
-      'X-Relevant-Policies': result.relevantPolicies.toString(),
+      'X-Relevant-Emails': result.relevantEmails.length.toString(),
       'X-Processing-Timestamp': new Date().toISOString()
     });
 
@@ -202,26 +202,26 @@ router.post('/query-voice-to-voice', upload.single('audio'), async (req, res) =>
   }
 });
 
-// Get all policies
-router.get('/policies', (req, res) => {
+// Get all emails
+router.get('/emails', (req, res) => {
   try {
     const vectorStore = ragService.getVectorStore();
-    const policies = vectorStore.getAllPolicies();
+    const emails = vectorStore.getAllEmails();
 
     res.json({
       success: true,
-      totalPolicies: policies.length,
-      policies: policies.map(policy => ({
-        id: policy.id,
-        title: policy.title,
-        category: policy.category,
-        contentLength: policy.content.length,
-        hasEmbedding: policy.embedding.length > 0
+      totalEmails: emails.length,
+      emails: emails.map(email => ({
+        id: email.id,
+        title: email.title,
+        category: email.category,
+        contentLength: email.content.length,
+        hasEmbedding: email.embedding.length > 0
       }))
     });
 
   } catch (error) {
-    Logger.error('Failed to get policies:', error);
+    Logger.error('Failed to get emails:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to retrieve policies'
@@ -233,14 +233,14 @@ router.get('/policies', (req, res) => {
 router.get('/stats', (req, res) => {
   try {
     const vectorStore = ragService.getVectorStore();
-    const policies = vectorStore.getAllPolicies();
+    const emails = vectorStore.getAllEmails();
 
     const stats = {
-      totalPolicies: policies.length,
-      categories: [...new Set(policies.map(p => p.category))],
-      embeddingDimension: policies[0]?.embedding.length || 0,
-      averageContentLength: policies.length > 0 
-        ? Math.round(policies.reduce((sum, p) => sum + p.content.length, 0) / policies.length)
+      totalEmails: emails.length,
+      categories: [...new Set(emails.map(e => e.category))],
+      embeddingDimension: emails[0]?.embedding.length || 0,
+      averageContentLength: emails.length > 0 
+        ? Math.round(emails.reduce((sum, e) => sum + e.content.length, 0) / emails.length)
         : 0
     };
 
