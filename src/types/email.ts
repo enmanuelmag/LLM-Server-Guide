@@ -1,3 +1,4 @@
+
 import z from 'zod';
 
 export const AIDetectedEventSchema = z.object({
@@ -30,17 +31,22 @@ export const AIDetectedEventSchema = z.object({
 export type AIDetectedEventType = z.infer<typeof AIDetectedEventSchema>;
 
 // Email types for simulation
-export interface EmailData {
-  id: string;
-  from: string;
-  subject: string;
-  body: string;
-  receivedAt: number;
-  attachments?: string[];
-}
 
-export interface EmailSender {
-  email: string;
-  name: string;
-  type: 'bank' | 'vendor' | 'subscription' | 'other';
-}
+export const EmailDataSchema = z.object({
+  id: z.string(),
+  from: z.string(),
+  subject: z.string(),
+  body: z.string(),
+  receivedAt: z.number(),
+  attachments: z.string().array().optional(),
+});
+
+export type EmailData = z.infer<typeof EmailDataSchema>;
+
+export const EmailSenderSchema = z.object({
+  email: z.string(),
+  name: z.string(),
+  type: z.enum(['bank', 'vendor', 'subscription', 'other']),
+});
+
+export type EmailSender = z.infer<typeof EmailSenderSchema>;
