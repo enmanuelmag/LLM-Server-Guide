@@ -1,6 +1,6 @@
 /**
- * Email Search Service with Function Calling Support - Simplified
- * Branch 5: fetch-emails - Simplified email search with only sender, subject, dateRange
+ * Email Search Service with Function Calling Support
+ * Branch 5: fetch-emails - Structured email search capabilities
  */
 
 import { Logger } from '../utils/logger';
@@ -24,7 +24,7 @@ export class EmailSearchService {
   }
 
   /**
-   * Search emails with simplified parameters: sender, subject, dateRange
+   * Search emails with structured parameters from function calling
    */
   async searchEmails(params: EmailSearchParams): Promise<EmailSearchResult> {
     Logger.debug(
@@ -34,59 +34,129 @@ export class EmailSearchService {
 
     let filteredEmails = [...this.emails];
 
-    // Filter by sender (exact email match)
-    if (params.sender) {
+    // Filter by senders
+    if (params.senders && params.senders.length > 0) {
       filteredEmails = filteredEmails.filter((email) =>
-        email.title.toLowerCase().includes(params.sender!.toLowerCase()) ||
-        email.content.toLowerCase().includes(params.sender!.toLowerCase())
+        params.senders!.some(
+          (sender) =>
+            email.title.toLowerCase().includes(sender.toLowerCase()) ||
+            email.content.toLowerCase().includes(sender.toLowerCase())
+        )
       );
       Logger.debug(
-        `📧 Filtered by sender ${params.sender}: ${filteredEmails.length} emails remaining`
+        `📧 Filtered by senders: ${filteredEmails.length} emails remaining`
       );
     }
 
-    // Filter by subject (contains)
-    if (params.subject) {
+    // Filter by subjects/keywords
+    if (params.subjects && params.subjects.length > 0) {
       filteredEmails = filteredEmails.filter((email) =>
-        email.title.toLowerCase().includes(params.subject!.toLowerCase())
+        params.subjects!.some(
+          (subject) =>
+            email.title.toLowerCase().includes(subject.toLowerCase()) ||
+            email.content.toLowerCase().includes(subject.toLowerCase())
+        )
       );
       Logger.debug(
-        `📧 Filtered by subject "${params.subject}": ${filteredEmails.length} emails remaining`
+        `🏷️ Filtered by subjects: ${filteredEmails.length} emails remaining`
       );
     }
 
-    // Filter by date range (optional, defaults to current day)
-    let dateStart: Date;
-    let dateEnd: Date;
-    
-    if (params.dateRange) {
-      dateStart = new Date(params.dateRange.start);
-      dateEnd = new Date(params.dateRange.end);
-    } else {
-      // Default to current day
-      const now = new Date();
-      dateStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      dateEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    // Filter by merchants
+    if (params.merchants && params.merchants.length > 0) {
+      filteredEmails = filteredEmails.filter((email) =>
+        params.merchants!.some(
+          (merchant) =>
+            email.title.toLowerCase().includes(merchant.toLowerCase()) ||
+            email.content.toLowerCase().includes(merchant.toLowerCase())
+        )
+      );
+      Logger.debug(
+        `🏪 Filtered by merchants: ${filteredEmails.length} emails remaining`
+      );
     }
 
-    // For now, skip date filtering as mock data doesn't have proper date fields
-    Logger.debug(
-      `📅 Date range: ${dateStart.toISOString()} to ${dateEnd.toISOString()}`
+    // Filter by categories
+    if (params.categories && params.categories.length > 0) {
+      filteredEmails = filteredEmails.filter((email) =>
+        params.categories!.some((category) => {
+          const categoryMap: { [key: string]: string[] } = {
+            comestibles: ['walmart', 'grocery', 'food', 'comestible'],
+            entretenimiento: [
+              'netflix',
+              'spotify',
+              'entertainment',
+              'música',
+              'video',
+            ],
+            electrónicos: ['amazon', 'electronics', 'gadget', 'tech'],
+            suscripciones: ['netflix', 'spotify', 'subscription', 'monthly'],
+            bancos: ['bank', 'chase', 'santander', 'bbva'],
+            promociones: ['promotion', 'discount', 'offer', 'deal'],
+          };
+
+          const keywords = categoryMap[category.toLowerCase()] || [
+            category.toLowerCase(),
+          ];
+          return keywords.some(
+            (keyword) =>
+              email.title.toLowerCase().includes(keyword) ||
+              email.content.toLowerCase().includes(keyword)
+          );
+        })
+      );
+      Logger.debug(
+        `📂 Filtered by categories: ${filteredEmails.length} emails remaining`
+      );
+    }
+
+    // Extract amounts and filter by amount range
+    const emailsWithAmounts = filteredEmails.map((email) => {
+      const amountMatch = email.content.match(/\$?([\d,]+\.?\d*)/);
+      const amount = amountMatch
+        ? parseFloat(amountMatch[1].replace(',', ''))
+        : 0;
+      return { ...email, amount };
+    });
+
+    let finalEmails = emailsWithAmounts;
+
+    if (params.minAmount !== undefined) {
+      finalEmails = finalEmails.filter(
+        (email) => email.amount >= params.minAmount!
+      );
+      Logger.debug(
+        `💰 Filtered by min amount $${params.minAmount}: ${finalEmails.length} emails remaining`
+      );
+    }
+
+    if (params.maxAmount !== undefined) {
+      finalEmails = finalEmails.filter(
+        (email) => email.amount <= params.maxAmount!
+      );
+      Logger.debug(
+        `💰 Filtered by max amount $${params.maxAmount}: ${finalEmails.length} emails remaining`
+      );
+    }
+
+    // Calculate total amount
+    const totalAmount = finalEmails.reduce(
+      (sum, email) => sum + email.amount,
+      0
     );
 
-    const finalEmails = filteredEmails.slice(0, 20); // Limit results
+    // Generate summary
+    const summary = this.generateSearchSummary(
+      finalEmails,
+      params,
+      totalAmount
+    );
 
-    // Calculate total amount if emails have amount field
-    const totalAmount = finalEmails.reduce((sum, email) => {
-      // Try to extract amount from email content
-      const amountMatch = email.content.match(/\$([0-9,]+\.?[0-9]*)/);
-      const amount = amountMatch ? parseFloat(amountMatch[1].replace(',', '')) : 0;
-      return sum + amount;
-    }, 0);
-
-    const summary = this.generateSearchSummary(finalEmails, params, totalAmount);
-
-    Logger.info(`✅ Email search completed: ${finalEmails.length} results`);
+    Logger.info(
+      `✅ Email search completed: ${
+        finalEmails.length
+      } emails found, total: $${totalAmount.toFixed(2)}`
+    );
 
     return {
       emails: finalEmails,
@@ -97,7 +167,7 @@ export class EmailSearchService {
   }
 
   /**
-   * Generate human-readable search summary
+   * Generate a human-readable summary of the search results
    */
   private generateSearchSummary(
     emails: any[],
@@ -122,13 +192,16 @@ export class EmailSearchService {
 
     // Add details about search criteria
     const criteria = [];
-    if (params.sender) criteria.push(`remitente: ${params.sender}`);
-    if (params.subject) criteria.push(`asunto: "${params.subject}"`);
-    if (params.dateRange) {
-      criteria.push(`fechas: ${params.dateRange.start} a ${params.dateRange.end}`);
-    } else {
-      criteria.push('fecha: día actual');
-    }
+    if (params.senders?.length)
+      criteria.push(`remitentes: ${params.senders.join(', ')}`);
+    if (params.categories?.length)
+      criteria.push(`categorías: ${params.categories.join(', ')}`);
+    if (params.merchants?.length)
+      criteria.push(`comerciantes: ${params.merchants.join(', ')}`);
+    if (params.minAmount !== undefined)
+      criteria.push(`monto mínimo: $${params.minAmount}`);
+    if (params.maxAmount !== undefined)
+      criteria.push(`monto máximo: $${params.maxAmount}`);
 
     if (criteria.length > 0) {
       summary += `Criterios aplicados: ${criteria.join(', ')}.`;
@@ -138,18 +211,30 @@ export class EmailSearchService {
   }
 
   /**
-   * Get all available senders from emails (for testing/debugging)
+   * Get all unique senders from emails
    */
   getAvailableSenders(): string[] {
     const senders = new Set<string>();
     this.emails.forEach((email) => {
-      // Try to extract sender from email content or title
-      const fromMatch = email.content.match(/De:\s*([^\n]+)/i) || 
-                      email.title.match(/from\s*([^\s]+)/i);
+      const fromMatch = email.content.match(/De:\s*([^\n]+)/);
       if (fromMatch) {
         senders.add(fromMatch[1].trim());
       }
     });
     return Array.from(senders);
+  }
+
+  /**
+   * Get all available categories
+   */
+  getAvailableCategories(): string[] {
+    return [
+      'comestibles',
+      'entretenimiento',
+      'electrónicos',
+      'suscripciones',
+      'bancos',
+      'promociones',
+    ];
   }
 }

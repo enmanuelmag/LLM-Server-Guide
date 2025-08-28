@@ -3,70 +3,84 @@
  * Branch 5: fetch-emails - Enhanced email search with structured parameters
  */
 
-import { z } from 'zod';
+export interface EmailSearchParams {
+  senders?: string[];
+  subjects?: string[];
+  dateRange?: {
+    from?: string;
+    to?: string;
+  };
+  merchants?: string[];
+  categories?: string[];
+  minAmount?: number;
+  maxAmount?: number;
+}
 
-// Zod schemas replacing interfaces
-export const EmailSearchParamsSchema = z.object({
-  sender: z.string().email().optional().describe('Email completo del remitente'),
-  subject: z.string().optional().describe('Texto a buscar en el asunto (contains)'),
-  dateRange: z.object({
-    start: z.string().datetime().describe('Fecha de inicio en formato ISO'),
-    end: z.string().datetime().describe('Fecha de fin en formato ISO')
-  }).optional().describe('Rango de fechas para la búsqueda')
-});
+export interface FunctionCallResult {
+  success: boolean;
+  data?: any;
+  error?: string;
+  functionName: string;
+}
 
-export const FunctionCallResultSchema = z.object({
-  success: z.boolean(),
-  data: z.any().optional(),
-  error: z.string().optional(),
-  functionName: z.string()
-});
-
-export const EmailSearchResultSchema = z.object({
-  emails: z.array(z.any()),
-  totalAmount: z.number().optional(),
-  summary: z.string(),
-  searchParams: EmailSearchParamsSchema
-});
-
-// Inferred types from Zod schemas
-export type EmailSearchParams = z.infer<typeof EmailSearchParamsSchema>;
-export type FunctionCallResult = z.infer<typeof FunctionCallResultSchema>;
-export type EmailSearchResult = z.infer<typeof EmailSearchResultSchema>;
+export interface EmailSearchResult {
+  emails: any[];
+  totalAmount?: number;
+  summary: string;
+  searchParams: EmailSearchParams;
+}
 
 // OpenAI Function Definitions
 export const EMAIL_SEARCH_FUNCTION = {
-  name: 'searchEmails',
-  description: 'Buscar emails por remitente, asunto y rango de fechas',
+  name: 'search_emails',
+  description:
+    'Busca emails basado en parámetros específicos como remitentes, fechas, montos, categorías, etc.',
   parameters: {
     type: 'object',
     properties: {
-      sender: {
-        type: 'string',
-        description: 'Email completo del remitente (ej: "billing@netflix.com")'
+      senders: {
+        type: 'array',
+        items: { type: 'string' },
+        description:
+          "Lista de remitentes de email (ej: ['walmart', 'amazon', 'netflix'])",
       },
-      subject: {
-        type: 'string',
-        description: 'Texto a buscar en el asunto del email (se aplica contains)'
+      subjects: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Palabras clave en el asunto del email',
       },
       dateRange: {
         type: 'object',
         properties: {
-          start: {
+          from: {
             type: 'string',
-            format: 'date-time',
-            description: 'Fecha de inicio de búsqueda en formato ISO'
+            description: 'Fecha de inicio en formato YYYY-MM-DD',
           },
-          end: {
+          to: {
             type: 'string',
-            format: 'date-time', 
-            description: 'Fecha de fin de búsqueda en formato ISO'
-          }
+            description: 'Fecha final en formato YYYY-MM-DD',
+          },
         },
-        required: ['start', 'end'],
-        description: 'Rango de fechas para la búsqueda (opcional, por defecto día actual)'
-      }
+      },
+      merchants: {
+        type: 'array',
+        items: { type: 'string' },
+        description: 'Nombres de comerciantes o tiendas',
+      },
+      categories: {
+        type: 'array',
+        items: { type: 'string' },
+        description:
+          "Categorías de gastos (ej: ['comestibles', 'entretenimiento', 'electrónicos'])",
+      },
+      minAmount: {
+        type: 'number',
+        description: 'Monto mínimo de la transacción',
+      },
+      maxAmount: {
+        type: 'number',
+        description: 'Monto máximo de la transacción',
+      },
     },
-    required: []
-  }
+  },
 };
