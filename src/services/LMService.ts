@@ -181,6 +181,7 @@ export class LMService {
         break;
       }
 
+
       // Process each tool call
       for (const toolCall of assistantMessage.tool_calls) {
         // Avoid duplicate calls
