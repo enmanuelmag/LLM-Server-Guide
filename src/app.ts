@@ -8,6 +8,7 @@ import fineTuningRoutes from './routes/fine-tuning';
 import ragRoutes from './routes/rag';
 import emailProcessingRoutes from './routes/email-processing';
 import moderationRoutes from './routes/moderation';
+import emailRoutes from './routes/emails';
 
 const app = express();
 const ragService = new RAGService();
@@ -19,8 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 // Route modules
 app.use('/fine-tuning', fineTuningRoutes);
 app.use('/rag', ragRoutes);
-app.use('/email', emailProcessingRoutes);
-app.use('/api/moderation', moderationRoutes);
+app.use('/email-processing', emailProcessingRoutes);
+app.use('/moderation', moderationRoutes);
+app.use('/emails', emailRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
