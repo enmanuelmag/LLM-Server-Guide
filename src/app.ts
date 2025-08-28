@@ -1,12 +1,16 @@
 import express from 'express';
 import { config } from './config';
 import { Logger } from './utils/logger';
+import emailRoutes from './routes/emails';
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Mount routes
+app.use('/emails', emailRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {

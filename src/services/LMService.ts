@@ -3,18 +3,24 @@ import { EmailClassificationRequest, EmailClassificationResult, FineTuningStats 
 import { FINE_TUNING_DATASET } from '../data/fine-tuning-dataset';
 import { ChatMessage, ChatCompletionResponse } from '../types/chat';
 import { GenericDBService } from './GenericDBService';
+import { EmailSearchService } from './EmailSearchService';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
+
+// Re-export ChatMessage for other services
+export { ChatMessage } from '../types/chat';
 
 export class LMService {
   private openai: OpenAI;
   private dbService: GenericDBService;
+  private emailSearchService: EmailSearchService;
 
   constructor() {
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
     this.dbService = new GenericDBService();
+    this.emailSearchService = new EmailSearchService();
   }
 
   /**
@@ -91,6 +97,46 @@ export class LMService {
           ],
         },
       },
+    }, {
+      type: 'function' as const,
+      function: {
+        name: 'searchEmails',
+        description: 'Buscar emails en la base de datos usando diferentes criterios como remitentes, categorías, montos, etc.',
+        parameters: {
+          type: 'object',
+          properties: {
+            senders: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Lista de remitentes a buscar (ej: ["netflix", "amazon"])'
+            },
+            subjects: {
+              type: 'array', 
+              items: { type: 'string' },
+              description: 'Lista de palabras clave en el asunto (ej: ["factura", "pago"])'
+            },
+            categories: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Categorías de gastos: comestibles, entretenimiento, electrónicos, suscripciones, bancos, promociones'
+            },
+            merchants: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Lista de comerciantes específicos (ej: ["walmart", "spotify"])'
+            },
+            minAmount: {
+              type: 'number',
+              description: 'Monto mínimo en dólares'
+            },
+            maxAmount: {
+              type: 'number', 
+              description: 'Monto máximo en dólares'
+            }
+          },
+          required: []
+        }
+      }
     }];
 
     let maxRetries = 3;
@@ -219,6 +265,21 @@ export class LMService {
         
         processedEmailIds.add(args.id);
         return await this.dbService.saveEmail(args);
+      } else if (functionName === 'searchEmails') {
+        const params = JSON.parse(argumentsString);
+        const result = await this.emailSearchService.searchEmails(params);
+        
+        return JSON.stringify({
+          success: true,
+          totalEmails: result.emails.length,
+          totalAmount: result.totalAmount,
+          summary: result.summary,
+          emails: result.emails.map((email: any) => ({
+            title: email.title,
+            amount: email.amount || 0,
+            content: email.content.substring(0, 200) + '...'
+          }))
+        }, null, 2);
       } else {
         return { success: false, error: `Unknown function: ${functionName}` };
       }
