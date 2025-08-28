@@ -3,6 +3,7 @@ import { config } from './config';
 import { Logger } from './utils/logger';
 import { EnhancedRAGService } from './services/EnhancedRAGService';
 import ragRoutes from './routes/rag';
+import emailRoutes from './routes/emails';
 
 const app = express();
 const ragService = new EnhancedRAGService();
@@ -13,6 +14,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Mount routes
 app.use('/rag', ragRoutes);
+app.use('/emails', emailRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
