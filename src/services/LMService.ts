@@ -99,37 +99,34 @@ export class LMService {
       type: 'function' as const,
       function: {
         name: 'searchEmails',
-        description: 'Buscar emails en la base de datos usando diferentes criterios como remitentes, categorías, montos, etc.',
+        description: 'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
         parameters: {
           type: 'object',
           properties: {
-            senders: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Lista de remitentes a buscar (ej: ["netflix", "amazon"])'
+            sender: {
+              type: 'string',
+              format: 'email',
+              description: 'Email del remitente específico'
             },
-            subjects: {
-              type: 'array', 
-              items: { type: 'string' },
-              description: 'Lista de palabras clave en el asunto (ej: ["factura", "pago"])'
+            subject: {
+              type: 'string',
+              description: 'Texto a buscar en el asunto del email'
             },
-            categories: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Categorías de gastos: comestibles, entretenimiento, electrónicos, suscripciones, bancos, promociones'
-            },
-            merchants: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Lista de comerciantes específicos (ej: ["walmart", "spotify"])'
-            },
-            minAmount: {
-              type: 'number',
-              description: 'Monto mínimo en dólares'
-            },
-            maxAmount: {
-              type: 'number', 
-              description: 'Monto máximo en dólares'
+            dateRange: {
+              type: 'object',
+              properties: {
+                start: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Fecha de inicio en formato ISO'
+                },
+                end: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Fecha de fin en formato ISO'
+                }
+              },
+              description: 'Rango de fechas para la búsqueda'
             }
           },
           required: []
@@ -256,13 +253,12 @@ export class LMService {
         
         return JSON.stringify({
           success: true,
-          totalEmails: result.emails.length,
-          totalAmount: result.totalAmount,
-          summary: result.summary,
+          totalEmails: result.totalEmails,
           emails: result.emails.map((email: any) => ({
             title: email.title,
-            amount: email.amount || 0,
-            content: email.content.substring(0, 200) + '...'
+            content: email.content.substring(0, 200) + '...',
+            category: email.category,
+            date: email.date
           }))
         }, null, 2);
       } else {

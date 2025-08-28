@@ -5,7 +5,7 @@
 
 import { z } from 'zod';
 
-// Zod schemas replacing interfaces - Extended for comprehensive email search
+// Zod schemas replacing interfaces - Simplified for branch 5
 export const EmailSearchParamsSchema = z.object({
   sender: z
     .string()
@@ -23,30 +23,6 @@ export const EmailSearchParamsSchema = z.object({
     })
     .optional()
     .describe('Rango de fechas para la búsqueda'),
-  senders: z
-    .array(z.string())
-    .optional()
-    .describe('Lista de remitentes para buscar'),
-  subjects: z
-    .array(z.string())
-    .optional()
-    .describe('Palabras clave en el asunto del email'),
-  merchants: z
-    .array(z.string())
-    .optional()
-    .describe('Nombres de comerciantes o tiendas'),
-  categories: z
-    .array(z.string())
-    .optional()
-    .describe('Categorías de gastos'),
-  minAmount: z
-    .number()
-    .optional()
-    .describe('Monto mínimo de la transacción'),
-  maxAmount: z
-    .number()
-    .optional()
-    .describe('Monto máximo de la transacción'),
 });
 
 export const FunctionCallResultSchema = z.object({
@@ -60,8 +36,6 @@ export const EmailSearchResultSchema = z.object({
   emails: z.array(z.any()),
   totalEmails: z.number(),
   searchParams: EmailSearchParamsSchema,
-  totalAmount: z.number().optional(),
-  summary: z.string().optional(),
 });
 
 // Inferred types from Zod schemas

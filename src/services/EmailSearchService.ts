@@ -1,30 +1,18 @@
-/**
- * Email Search Service with Function Calling Support
- * Branch 5: fetch-emails - Structured email search capabilities
- */
-
-import { Logger } from '../utils/logger';
-import {
-  EmailSearchParams,
-  EmailSearchResult,
-} from '../types/function-calling';
-import { EmailData } from '../types/rag';
+import { EmailSearchParams, EmailSearchResult } from '../types/function-calling';
 import { EMAIL_DATABASE } from '../data/email-mock-data';
+import { Logger } from '../utils/logger';
 
 export class EmailSearchService {
-  private emails: EmailData[];
+  private emails: any[];
 
   constructor() {
-    this.emails = EMAIL_DATABASE as EmailData[];
-    Logger.info(
-      '📧 Email Search Service initialized with',
-      this.emails.length,
-      'emails'
-    );
+    // Initialize with EMAIL_DATABASE
+    this.emails = EMAIL_DATABASE;
+    Logger.info(`📚 Email database initialized with ${this.emails.length} emails`);
   }
 
   /**
-   * Search emails with structured parameters from function calling
+   * Search emails based on simplified parameters: sender, subject, dateRange
    */
   async searchEmails(params: EmailSearchParams): Promise<EmailSearchResult> {
     Logger.debug(
@@ -34,208 +22,57 @@ export class EmailSearchService {
 
     let filteredEmails = [...this.emails];
 
-    // Filter by senders
-    if (params.senders && params.senders.length > 0) {
+    // Filter by sender
+    if (params.sender) {
       filteredEmails = filteredEmails.filter((email) =>
-        params.senders!.some(
-          (sender) =>
-            email.title.toLowerCase().includes(sender.toLowerCase()) ||
-            email.content.toLowerCase().includes(sender.toLowerCase())
-        )
+        email.title.toLowerCase().includes(params.sender!.toLowerCase()) ||
+        email.content.toLowerCase().includes(params.sender!.toLowerCase())
       );
       Logger.debug(
-        `📧 Filtered by senders: ${filteredEmails.length} emails remaining`
+        `📧 Filtered by sender: ${filteredEmails.length} emails remaining`
       );
     }
 
-    // Filter by subjects/keywords
-    if (params.subjects && params.subjects.length > 0) {
+    // Filter by subject
+    if (params.subject) {
       filteredEmails = filteredEmails.filter((email) =>
-        params.subjects!.some(
-          (subject) =>
-            email.title.toLowerCase().includes(subject.toLowerCase()) ||
-            email.content.toLowerCase().includes(subject.toLowerCase())
-        )
+        email.title.toLowerCase().includes(params.subject!.toLowerCase()) ||
+        email.content.toLowerCase().includes(params.subject!.toLowerCase())
       );
       Logger.debug(
-        `🏷️ Filtered by subjects: ${filteredEmails.length} emails remaining`
+        `🏷️ Filtered by subject: ${filteredEmails.length} emails remaining`
       );
     }
 
-    // Filter by merchants
-    if (params.merchants && params.merchants.length > 0) {
-      filteredEmails = filteredEmails.filter((email) =>
-        params.merchants!.some(
-          (merchant) =>
-            email.title.toLowerCase().includes(merchant.toLowerCase()) ||
-            email.content.toLowerCase().includes(merchant.toLowerCase())
-        )
-      );
+    // Filter by date range
+    if (params.dateRange) {
+      const startDate = new Date(params.dateRange.start);
+      const endDate = new Date(params.dateRange.end);
+      
+      filteredEmails = filteredEmails.filter((email) => {
+        const emailDate = new Date(email.date);
+        return emailDate >= startDate && emailDate <= endDate;
+      });
       Logger.debug(
-        `🏪 Filtered by merchants: ${filteredEmails.length} emails remaining`
+        `📅 Filtered by date range: ${filteredEmails.length} emails remaining`
       );
     }
-
-    // Filter by categories
-    if (params.categories && params.categories.length > 0) {
-      filteredEmails = filteredEmails.filter((email) =>
-        params.categories!.some((category) => {
-          const categoryMap: { [key: string]: string[] } = {
-            comestibles: ['walmart', 'grocery', 'food', 'comestible'],
-            entretenimiento: [
-              'netflix',
-              'spotify',
-              'entertainment',
-              'música',
-              'video',
-            ],
-            electrónicos: ['amazon', 'electronics', 'gadget', 'tech'],
-            suscripciones: ['netflix', 'spotify', 'subscription', 'monthly'],
-            bancos: ['bank', 'chase', 'santander', 'bbva'],
-            promociones: ['promotion', 'discount', 'offer', 'deal'],
-          };
-
-          const keywords = categoryMap[category.toLowerCase()] || [
-            category.toLowerCase(),
-          ];
-          return keywords.some(
-            (keyword) =>
-              email.title.toLowerCase().includes(keyword) ||
-              email.content.toLowerCase().includes(keyword)
-          );
-        })
-      );
-      Logger.debug(
-        `📂 Filtered by categories: ${filteredEmails.length} emails remaining`
-      );
-    }
-
-    // Extract amounts and filter by amount range
-    const emailsWithAmounts = filteredEmails.map((email) => {
-      const amountMatch = email.content.match(/\$?([\d,]+\.?\d*)/);
-      const amount = amountMatch
-        ? parseFloat(amountMatch[1].replace(',', ''))
-        : 0;
-      return { ...email, amount };
-    });
-
-    let finalEmails = emailsWithAmounts;
-
-    if (params.minAmount !== undefined) {
-      finalEmails = finalEmails.filter(
-        (email) => email.amount >= params.minAmount!
-      );
-      Logger.debug(
-        `💰 Filtered by min amount $${params.minAmount}: ${finalEmails.length} emails remaining`
-      );
-    }
-
-    if (params.maxAmount !== undefined) {
-      finalEmails = finalEmails.filter(
-        (email) => email.amount <= params.maxAmount!
-      );
-      Logger.debug(
-        `💰 Filtered by max amount $${params.maxAmount}: ${finalEmails.length} emails remaining`
-      );
-    }
-
-    // Calculate total amount
-    const totalAmount = finalEmails.reduce(
-      (sum, email) => sum + email.amount,
-      0
-    );
-
-    // Generate summary
-    const summary = this.generateSearchSummary(
-      finalEmails,
-      params,
-      totalAmount
-    );
 
     Logger.info(
-      `✅ Email search completed: ${
-        finalEmails.length
-      } emails found, total: $${totalAmount.toFixed(2)}`
+      `✅ Email search completed: ${filteredEmails.length} emails found`
     );
 
     return {
-      emails: finalEmails,
-      totalEmails: finalEmails.length,
-      totalAmount,
-      summary,
+      emails: filteredEmails,
+      totalEmails: filteredEmails.length,
       searchParams: params,
     };
   }
 
   /**
-   * Generate a human-readable summary of the search results
+   * Get all emails from the database
    */
-  private generateSearchSummary(
-    emails: any[],
-    params: EmailSearchParams,
-    totalAmount: number
-  ): string {
-    const count = emails.length;
-
-    if (count === 0) {
-      return 'No encontré emails que coincidan con los criterios de búsqueda especificados.';
-    }
-
-    let summary = `Encontré ${count} email${count > 1 ? 's' : ''} que coincide${
-      count > 1 ? 'n' : ''
-    } con tu búsqueda`;
-
-    if (totalAmount > 0) {
-      summary += ` con un total de $${totalAmount.toFixed(2)}`;
-    }
-
-    summary += '. ';
-
-    // Add details about search criteria
-    const criteria = [];
-    if (params.senders?.length)
-      criteria.push(`remitentes: ${params.senders.join(', ')}`);
-    if (params.categories?.length)
-      criteria.push(`categorías: ${params.categories.join(', ')}`);
-    if (params.merchants?.length)
-      criteria.push(`comerciantes: ${params.merchants.join(', ')}`);
-    if (params.minAmount !== undefined)
-      criteria.push(`monto mínimo: $${params.minAmount}`);
-    if (params.maxAmount !== undefined)
-      criteria.push(`monto máximo: $${params.maxAmount}`);
-
-    if (criteria.length > 0) {
-      summary += `Criterios aplicados: ${criteria.join(', ')}.`;
-    }
-
-    return summary;
-  }
-
-  /**
-   * Get all unique senders from emails
-   */
-  getAvailableSenders(): string[] {
-    const senders = new Set<string>();
-    this.emails.forEach((email) => {
-      const fromMatch = email.content.match(/De:\s*([^\n]+)/);
-      if (fromMatch) {
-        senders.add(fromMatch[1].trim());
-      }
-    });
-    return Array.from(senders);
-  }
-
-  /**
-   * Get all available categories
-   */
-  getAvailableCategories(): string[] {
-    return [
-      'comestibles',
-      'entretenimiento',
-      'electrónicos',
-      'suscripciones',
-      'bancos',
-      'promociones',
-    ];
+  getAllEmails(): any[] {
+    return [...this.emails];
   }
 }
