@@ -2,7 +2,7 @@
   "instructions": [
     "Audio to Text Query Test with Financial Emails",
     "1. Create a voice message asking: '¿Cuánto gasté en Amazon este mes?'",
-    "2. Save as MP3, WAV, or M4A format", 
+    "2. Save as MP3, WAV, or M4A format",
     "3. Send POST to /rag/query-voice-to-text with audio file as 'audio' field",
     "4. Expected: JSON response with transcription and RAG answer from email database"
   ],
@@ -14,7 +14,7 @@
   },
   "sampleQueries": [
     "¿Cuánto gasté en Amazon este mes?",
-    "¿Qué suscripciones tengo activas?", 
+    "¿Qué suscripciones tengo activas?",
     "¿Cuándo fue mi última transferencia bancaria?",
     "¿Hay alguna promoción de Starbucks disponible?",
     "¿Cuál es el balance de mi tarjeta Chase?"
@@ -28,7 +28,7 @@
       "processingTime": 1672531200000
     },
     "ragResponse": {
-      "query": "¿Cuánto gasté en Amazon este mes?", 
+      "query": "¿Cuánto gasté en Amazon este mes?",
       "answer": "Based on your email receipts, you made Amazon purchases including a MacBook Pro for $1,299.00 and Amazon Prime renewal for $139.00...",
       "relevantEmails": 2,
       "tokensUsed": 256
