@@ -16,7 +16,7 @@
 ### ✅ Rama 2: `2-rag-embedding`
 **RAG (Retrieval-Augmented Generation)**
 - Vector embeddings con `text-embedding-3-small`
-- Base de conocimiento con 8 políticas financieras
+- Base de conocimiento con 12 emails financieros simulados
 - RAGService para consultas contextuales
 - VectorStoreService para gestión de embeddings
 

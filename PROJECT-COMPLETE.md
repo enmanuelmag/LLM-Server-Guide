@@ -25,7 +25,7 @@ email-processor-ws-v2/
 │   │   ├── rag.ts
 │   │   └── fine-tuning.ts
 │   ├── data/                  # Datos simulados
-│   │   ├── financial-policies.ts     # 8 políticas financieras
+│   │   ├── financial-policies.ts     # 12 emails financieros simulados
 │   │   └── fine-tuning-dataset.ts    # 12 ejemplos de entrenamiento
 │   ├── services/              # Lógica de negocio
 │   │   ├── VectorStoreService.ts     # Vector store con embeddings
@@ -49,11 +49,11 @@ email-processor-ws-v2/
 - **Endpoints**: `/`, `/health`, `/docs`
 
 ### **Rama 2: `2-rag-embedding`** ✅
-- **RAG implementation** con Company Financial Policies
-- **8 políticas financieras** realistas (gastos, viajes, proveedores, etc.)
+- **RAG implementation** con Base de Emails Simulados
+- **12 emails financieros** realistas (Amazon, Netflix, bancos, etc.)
 - **Vector store en memoria** con cosine similarity
 - **Embeddings** con `text-embedding-3-small`
-- **Endpoints**: `POST /rag/query`, `GET /rag/policies`, `GET /rag/stats`
+- **Endpoints**: `POST /rag/query`, `GET /rag/emails`, `GET /rag/stats`
 
 ### **Rama 3: `3-fine-tuning`** ✅
 - **Dataset de entrenamiento** con 12 ejemplos reales
@@ -113,7 +113,7 @@ git checkout 4-email-processor  # Para procesamiento completo
 
 ### **🧠 Implementación Inteligente**
 - **Vector Store en memoria** (sin dependencias externas)
-- **Políticas financieras realistas** de empresa
+- **Emails financieros realistas** simulados
 - **Dataset balanceado** para fine-tuning
 - **Faker para simulación** de emails diversos
 - **Tool calling robusto** para extracción
@@ -137,7 +137,7 @@ git checkout 4-email-processor  # Para procesamiento completo
 5. **Rama 5**: Seguridad y moderación
 
 ### **Casos de Uso Reales**
-- **Políticas financieras** de empresa real
+- **Base de emails simulados** realistas
 - **Emails simulados** con variación realista
 - **Flujo completo** de procesamiento
 - **Métricas y monitoreo** profesional

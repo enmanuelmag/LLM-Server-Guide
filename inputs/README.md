@@ -49,9 +49,9 @@ curl -X POST http://localhost:3000/fine-tuning/classify-email \
 - `test-basic-query.json` - Query simple del sistema
 
 ### RAG (Rama 2)  
-- `test-policy-query.json` - Consulta de políticas financieras
+- `test-policy-query.json` - Consulta de emails financieros simulados
 - `test-fee-inquiry.json` - Consulta específica de tarifas
-- `test-regional-transfer.json` - Políticas de transferencias regionales
+- `test-regional-transfer.json` - Análisis de transferencias regionales
 
 ### Fine-tuning (Rama 3)
 - `test-receipt-classification.json` - Clasificación de recibos

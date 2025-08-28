@@ -28,17 +28,17 @@ curl http://localhost:3000/docs
 
 | Endpoint | Método | Descripción |
 |----------|--------|-------------|
-| `/rag/query` | POST | Consulta RAG con políticas financieras |
+| `/rag/query` | POST | Consulta RAG con emails financieros simulados |
 | `/rag/query-voice-to-text` | POST | Subir audio → JSON response |
 | `/rag/query-voice-to-voice` | POST | Subir audio → MP3 response |
-| `/rag/policies` | GET | Lista todas las políticas disponibles |
+| `/rag/emails` | GET | Lista todos los emails disponibles |
 | `/rag/stats` | GET | Estadísticas del vector store |
 
 **Archivos de prueba adicionales:**
-- `inputs/rag/test-policy-query.json`
-- `inputs/rag/test-fee-inquiry.json`
-- `inputs/rag/test-voice-to-text.json`
-- `inputs/rag/test-voice-to-voice.json`
+- `inputs/rag/test-policy-query.json` (Consultas sobre emails)
+- `inputs/rag/test-fee-inquiry.json` (Consultas sobre gastos)
+- `inputs/rag/test-voice-to-text.json` (Pruebas de audio)
+- `inputs/rag/test-voice-to-voice.json` (Audio completo)
 
 **Testing:**
 ```bash
