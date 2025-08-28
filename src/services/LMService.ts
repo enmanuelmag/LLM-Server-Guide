@@ -236,10 +236,15 @@ export class LMService {
         processedCallIds.add(toolCall.id);
 
         // Call the function and get result
-        const toolResult = await this.callFunction(
-          toolCall.function.name,
-          toolCall.function.arguments
-        );
+        let toolResult: any;
+        try {
+          toolResult = await this.callFunction(
+            toolCall.function.name,
+            toolCall.function.arguments
+          );
+        } catch (error) {
+          currentRetry++;
+        }
 
         // Add tool result to conversation
         conversationMessages.push({
@@ -248,8 +253,6 @@ export class LMService {
           tool_call_id: toolCall.id,
         });
       }
-
-      currentRetry++;
 
       // Check if we should retry due to errors
       if (currentRetry >= maxRetries) {
