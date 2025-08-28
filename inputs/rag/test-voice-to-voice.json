@@ -1,28 +1,30 @@
 {
   "instructions": [
-    "Voice to Voice Query Test",
-    "1. Create a voice message asking: '¿Puedo hacer transferencias a cuentas comerciales en el extranjero?'",
+    "Voice to Voice Query Test with Email Database",
+    "1. Create a voice message asking: '¿Hay alguna oferta de Starbucks disponible?'",
     "2. Save as MP3, WAV, or M4A format",
     "3. Send POST to /rag/query-voice-to-voice with audio file as 'audio' field",
-    "4. Expected: Audio MP3 file response with spoken RAG answer"
+    "4. Expected: Audio MP3 file response with spoken answer about Starbucks promotions from emails"
   ],
   "endpoints": {
-    "url": "/rag/query-voice-to-voice", 
+    "url": "/rag/query-voice-to-voice",
     "method": "POST",
     "contentType": "multipart/form-data",
     "field": "audio"
   },
   "sampleQueries": [
-    "¿Puedo hacer transferencias a cuentas comerciales en el extranjero?",
-    "Explícame las políticas de límites de gastos de oficina",
-    "¿Cómo funciona el proceso de autorización para pagos grandes?"
+    "¿Hay alguna oferta de Starbucks disponible?",
+    "¿Cuándo se vence mi renovación de Amazon Prime?",
+    "¿Cuál es mi balance actual en Chase?",
+    "¿Qué compras hice en Target?",
+    "¿Tengo algún inicio de sesión sospechoso en mi banco?"
   ],
   "expectedResponse": {
     "contentType": "audio/mpeg",
     "headers": {
       "X-Transcribed-Query": "Original transcribed question",
       "X-Response-Length": "Length of text response",
-      "X-Relevant-Policies": "Number of relevant policies found",
+      "X-Relevant-Emails": "Number of relevant emails found",
       "X-Processing-Timestamp": "ISO timestamp"
     },
     "file": "rag-response-{timestamp}.mp3"
@@ -30,7 +32,8 @@
   "testingTips": [
     "Use audio recording apps to create test files",
     "Speak clearly in Spanish for best transcription",
-    "Check response headers for metadata",
-    "Play returned MP3 to verify TTS quality"
+    "Check response headers for email metadata",
+    "Play returned MP3 to verify TTS quality",
+    "Test queries about specific merchants, subscriptions, and bank activities"
   ]
 }

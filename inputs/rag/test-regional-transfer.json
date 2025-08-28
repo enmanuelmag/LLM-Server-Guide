@@ -1,8 +1,8 @@
 {
-  "query": "Can I transfer money to my business account in Europe?",
+  "query": "¿Qué transferencias bancarias he hecho este mes?",
   "instructions": [
-    "Test regional transfer policies",
+    "Test bank transfer history query",
     "Send POST to /rag/query",
-    "Expected: Policy-based response about European transfers"
+    "Expected: Information about Wells Fargo transfers and other bank movements from email notifications"
   ]
 }
