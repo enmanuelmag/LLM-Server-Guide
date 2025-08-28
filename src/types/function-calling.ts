@@ -12,10 +12,6 @@ export const EmailSearchParamsSchema = z.object({
     .email()
     .optional()
     .describe('Email completo del remitente'),
-  subject: z
-    .string()
-    .optional()
-    .describe('Texto a buscar en el asunto (contains)'),
   dateRange: z
     .object({
       start: z.string().datetime().describe('Fecha de inicio en formato ISO'),

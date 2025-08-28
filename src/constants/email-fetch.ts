@@ -21,11 +21,7 @@ Analiza la consulta del usuario **siguiendo estas instrucciones**:
    - Ejemplos: "netflix@netflix.com", "billing@amazon.com", "no-reply@spotify.com"
    - Si el usuario menciona una empresa, convierte a formato de email (ej: "Netflix" → "netflix@netflix.com")
 
-2. **subject** (opcional): Texto a buscar en el asunto del email
-   - Usa palabras clave relevantes que podrían aparecer en el subject
-   - Ejemplos: "subscription", "payment", "receipt", "invoice", "billing"
-
-3. **dateRange** (opcional): Rango de fechas para la búsqueda
+2. **dateRange** (opcional): Rango de fechas para la búsqueda
    - Objeto con start y end en formato ISO
    - Ejemplos de períodos comunes:
      - "último mes": últimos 30 días
@@ -33,11 +29,11 @@ Analiza la consulta del usuario **siguiendo estas instrucciones**:
      - "ayer": desde ayer 00:00 hasta 23:59
 
 ### Mapeo de consultas comunes:
-- "Gastos de Netflix" → sender: "netflix@netflix.com", subject: "subscription"
-- "Compras de Amazon" → sender: "billing@amazon.com", subject: "order"
-- "Facturas del mes pasado" → dateRange: último mes, subject: "invoice"
+- "Gastos de Netflix" → sender: "netflix@netflix.com"
+- "Compras de Amazon" → sender: "billing@amazon.com"
+- "Facturas del mes pasado" → dateRange: último mes
 - "Emails de Spotify" → sender: "no-reply@spotify.com"
-- "Recibos de pago" → subject: "receipt"
+- "Recibos de diciembre" → dateRange: diciembre
 
 ---
 ## Ejecución de Búsqueda
@@ -49,10 +45,6 @@ Una vez identificados los criterios, **DEBES** usar la función search-emails co
 - **sender**: Email completo del remitente (opcional)
   - Solo incluir si hay un remitente específico identificado
   - Formato: "email@dominio.com"
-
-- **subject**: Palabras clave para buscar en el asunto (opcional)
-  - Solo incluir si hay términos específicos identificados
-  - Ejemplos: "subscription", "payment", "invoice", "receipt"
 
 - **dateRange**: Objeto con start y end en formato ISO (opcional)
   - Solo incluir si hay un período específico mencionado
@@ -67,7 +59,6 @@ Una vez identificados los criterios, **DEBES** usar la función search-emails co
 EJEMPLO DE LLAMADA A FUNCIÓN:
 {
   "sender": "netflix@netflix.com",
-  "subject": "subscription",
   "dateRange": {
     "start": "2025-07-28T00:00:00Z",
     "end": "2025-08-28T23:59:59Z"
