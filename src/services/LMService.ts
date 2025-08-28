@@ -98,7 +98,7 @@ export class LMService {
     }, {
       type: 'function' as const,
       function: {
-        name: 'searchEmails',
+        name: 'search-emails',
         description: 'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
         parameters: {
           type: 'object',
@@ -129,7 +129,7 @@ export class LMService {
               description: 'Rango de fechas para la búsqueda'
             }
           },
-          required: []
+          required: ['sender', 'subject', 'dateRange']
         }
       }
     }];
@@ -250,7 +250,7 @@ export class LMService {
       if (functionName === 'save-email') {
         const args = JSON.parse(argumentsString);
         return await this.dbService.saveEmail(args);
-      } else if (functionName === 'searchEmails') {
+      } else if (functionName === 'search-emails') {
         const params = JSON.parse(argumentsString);
         const result = await this.emailSearchService.searchEmails(params);
         
