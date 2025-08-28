@@ -54,35 +54,8 @@ export class EmailProcessorService {
 
       // If successful and we have final result, create AI detected event
       if (result.success && result.finalResult) {
-        try {
-          const args = result.finalResult;
-          const aiEvent: AIDetectedEventType = {
-            id: `ai_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-            userId,
-            emailId: email.id,
-            confidence: args.confidence,
-            amount: args.amount,
-            type: args.type,
-            name: args.name,
-            description: args.description || '',
-            detectedDate: Date.now(),
-            estimatedDate: new Date(args.date).getTime(),
-            status: 'pending', // Default status
-            budgetId: args.type === 'expense' ? 'general-expenses' : 'general-income',
-            createdAt: Date.now(),
-            updatedAt: Date.now()
-          };
-
-          // Validate with Zod schema
-          const validatedEvent = AIDetectedEventSchema.parse(aiEvent);
-          this.processedEmails.set(validatedEvent.id, validatedEvent);
-
-          Logger.success(`✅ Email processed successfully: ${validatedEvent.name} ($${validatedEvent.amount.value})`);
-          return validatedEvent;
-
-        } catch (parseError) {
-          Logger.error(`❌ Error creating AI event:`, parseError);
-        }
+        Logger.success(`✅ Email processed successfully`);
+        return result.finalResult;
       }
 
       Logger.info(`📄 Email processing completed: ${email.subject}`);
