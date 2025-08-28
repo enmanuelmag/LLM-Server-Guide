@@ -169,10 +169,11 @@ Siempre proporciona respuestas útiles, específicas y en español. Incluye mont
    */
   getSearchOptions() {
     return {
-      categories: this.emailSearch.getAvailableCategories(),
       senders: this.emailSearch.getAvailableSenders(),
       examples: [
-        '¿cuánto gasté en comestibles esta semana?',
+        'Buscar emails de billing@netflix.com',
+        'Emails con "invoice" en el asunto',
+        'Emails de ayer',
         '¿qué compré en Amazon?',
         'muéstrame los gastos mayores a $50',
         '¿cuáles fueron mis suscripciones este mes?',

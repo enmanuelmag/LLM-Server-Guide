@@ -4,21 +4,25 @@
  * Similar structure to EmailProcessorService but focused on search
  */
 
+import { z } from 'zod';
 import { Logger } from '../utils/logger';
 import { LMService, ChatMessage } from './LMService';
 
-export interface EmailFetchRequest {
-  userQuery: string;
-  context?: string;
-}
+export const EmailFetchRequestSchema = z.object({
+  userQuery: z.string(),
+  context: z.string().optional(),
+});
 
-export interface EmailFetchResult {
-  success: boolean;
-  response: string;
-  emailsFound?: number;
-  totalAmount?: number;
-  error?: string;
-}
+export const EmailFetchResultSchema = z.object({
+  success: z.boolean(),
+  response: z.string(),
+  emailsFound: z.number().optional(),
+  totalAmount: z.number().optional(),
+  error: z.string().optional(),
+});
+
+export type EmailFetchRequest = z.infer<typeof EmailFetchRequestSchema>;
+export type EmailFetchResult = z.infer<typeof EmailFetchResultSchema>;
 
 export class EmailFetchService {
   private lmService: LMService;

@@ -99,37 +99,34 @@ export class LMService {
       type: 'function' as const,
       function: {
         name: 'searchEmails',
-        description: 'Buscar emails en la base de datos usando diferentes criterios como remitentes, categorías, montos, etc.',
+        description: 'Buscar emails en la base de datos por remitente, asunto y rango de fechas',
         parameters: {
           type: 'object',
           properties: {
-            senders: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Lista de remitentes a buscar (ej: ["netflix", "amazon"])'
+            sender: {
+              type: 'string',
+              description: 'Email completo del remitente (ej: "billing@netflix.com")'
             },
-            subjects: {
-              type: 'array', 
-              items: { type: 'string' },
-              description: 'Lista de palabras clave en el asunto (ej: ["factura", "pago"])'
+            subject: {
+              type: 'string',
+              description: 'Texto a buscar en el asunto del email (se aplica contains)'
             },
-            categories: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Categorías de gastos: comestibles, entretenimiento, electrónicos, suscripciones, bancos, promociones'
-            },
-            merchants: {
-              type: 'array',
-              items: { type: 'string' },
-              description: 'Lista de comerciantes específicos (ej: ["walmart", "spotify"])'
-            },
-            minAmount: {
-              type: 'number',
-              description: 'Monto mínimo en dólares'
-            },
-            maxAmount: {
-              type: 'number', 
-              description: 'Monto máximo en dólares'
+            dateRange: {
+              type: 'object',
+              properties: {
+                start: {
+                  type: 'string',
+                  format: 'date-time',
+                  description: 'Fecha de inicio de búsqueda en formato ISO'
+                },
+                end: {
+                  type: 'string',
+                  format: 'date-time', 
+                  description: 'Fecha de fin de búsqueda en formato ISO'
+                }
+              },
+              required: ['start', 'end'],
+              description: 'Rango de fechas para la búsqueda (opcional, por defecto día actual)'
             }
           },
           required: []
