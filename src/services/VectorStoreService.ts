@@ -1,16 +1,12 @@
 import OpenAI from 'openai';
-import {
-  FinancialPolicy,
-  VectorStoreQuery,
-  VectorSearchResult,
-} from '../types/rag';
-import { FINANCIAL_POLICIES } from '../data/financial-policies';
+import { EmailData, VectorStoreQuery, VectorSearchResult } from '../types/rag';
+import { EMAIL_DATABASE } from '../data/email-mock-data';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class VectorStoreService {
   private openai: OpenAI;
-  private policies: FinancialPolicy[] = [];
+  private emails: EmailData[] = [];
   private isInitialized = false;
 
   constructor() {
@@ -20,31 +16,29 @@ export class VectorStoreService {
   }
 
   /**
-   * Initialize vector store by creating embeddings for all policies
+   * Initialize vector store by creating embeddings for all emails
    * En producción, esto se haría offline y se guardaría en una DB vectorial
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    Logger.info('🔄 Initializing vector store with financial policies...');
-
+    Logger.info('🔄 Initializing vector store with email database...');
+    
     try {
-      const policiesWithEmbeddings = await Promise.all(
-        FINANCIAL_POLICIES.map(async (policy) => {
-          const embedding = await this.createEmbedding(policy.content);
+      const emailsWithEmbeddings = await Promise.all(
+        EMAIL_DATABASE.map(async (email) => {
+          const embedding = await this.createEmbedding(email.content);
           return {
-            ...policy,
-            embedding,
+            ...email,
+            embedding
           };
         })
       );
 
-      this.policies = policiesWithEmbeddings;
+      this.emails = emailsWithEmbeddings;
       this.isInitialized = true;
-
-      Logger.success(
-        `✅ Vector store initialized with ${this.policies.length} policies`
-      );
+      
+      Logger.success(`✅ Vector store initialized with ${this.emails.length} emails`);
     } catch (error) {
       Logger.error('❌ Failed to initialize vector store:', error);
       throw error;
@@ -64,13 +58,9 @@ export class VectorStoreService {
   }
 
   /**
-   * Search for similar policies based on query
+   * Search for similar emails based on query
    */
-  async searchSimilar(
-    query: string,
-    limit: number = 3,
-    threshold: number = 0.7
-  ): Promise<VectorSearchResult[]> {
+  async searchSimilar(query: string, limit: number = 3, threshold: number = 0.7): Promise<VectorSearchResult[]> {
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -80,21 +70,19 @@ export class VectorStoreService {
     // Create embedding for the query
     const queryEmbedding = await this.createEmbedding(query);
 
-    // Calculate similarity with all policies
-    const similarities = this.policies.map((policy) => ({
-      policy,
-      similarity: this.cosineSimilarity(queryEmbedding, policy.embedding),
+    // Calculate similarity with all emails
+    const similarities = this.emails.map((email) => ({
+      email,
+      similarity: this.cosineSimilarity(queryEmbedding, email.embedding)
     }));
 
     // Filter by threshold and sort by similarity
     const results = similarities
-      .filter((result) => result.similarity >= threshold)
+      .filter(result => result.similarity >= threshold)
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit);
 
-    Logger.debug(
-      `📊 Found ${results.length} relevant policies (threshold: ${threshold})`
-    );
+    Logger.debug(`📊 Found ${results.length} relevant emails (threshold: ${threshold})`);
 
     return results;
   }
@@ -119,16 +107,16 @@ export class VectorStoreService {
   }
 
   /**
-   * Get all policies (for debugging)
+   * Get all emails (for debugging)
    */
-  getAllPolicies(): FinancialPolicy[] {
-    return this.policies;
+  getAllEmails(): EmailData[] {
+    return this.emails;
   }
 
   /**
-   * Get policy by ID
+   * Get email by ID
    */
-  getPolicyById(id: string): FinancialPolicy | undefined {
-    return this.policies.find((policy) => policy.id === id);
+  getEmailById(id: string): EmailData | undefined {
+    return this.emails.find(email => email.id === id);
   }
 }
