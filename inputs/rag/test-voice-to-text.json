@@ -1,10 +1,10 @@
 {
   "instructions": [
-    "Audio to Text Query Test",
-    "1. Create a voice message asking: '¿Cuáles son las tarifas para transferencias internacionales?'",
-    "2. Save as MP3, WAV, or M4A format",
+    "Audio to Text Query Test with Financial Emails",
+    "1. Create a voice message asking: '¿Cuánto gasté en Amazon este mes?'",
+    "2. Save as MP3, WAV, or M4A format", 
     "3. Send POST to /rag/query-voice-to-text with audio file as 'audio' field",
-    "4. Expected: JSON response with transcription and RAG answer"
+    "4. Expected: JSON response with transcription and RAG answer from email database"
   ],
   "endpoints": {
     "url": "/rag/query-voice-to-text",
@@ -13,22 +13,24 @@
     "field": "audio"
   },
   "sampleQueries": [
-    "¿Cuáles son las tarifas para transferencias internacionales?",
-    "¿Puedo transferir dinero a Europa desde mi cuenta comercial?",
-    "¿Cuál es el límite diario para transferencias electrónicas?"
+    "¿Cuánto gasté en Amazon este mes?",
+    "¿Qué suscripciones tengo activas?", 
+    "¿Cuándo fue mi última transferencia bancaria?",
+    "¿Hay alguna promoción de Starbucks disponible?",
+    "¿Cuál es el balance de mi tarjeta Chase?"
   ],
   "expectedResponse": {
     "success": true,
     "transcription": {
       "originalAudio": "query.mp3",
-      "transcribedText": "¿Cuáles son las tarifas para transferencias internacionales?",
+      "transcribedText": "¿Cuánto gasté en Amazon este mes?",
       "audioSize": 45678,
       "processingTime": 1672531200000
     },
     "ragResponse": {
-      "query": "¿Cuáles son las tarifas para transferencias internacionales?", 
-      "answer": "Based on company policies...",
-      "relevantPolicies": 3,
+      "query": "¿Cuánto gasté en Amazon este mes?", 
+      "answer": "Based on your email receipts, you made Amazon purchases including a MacBook Pro for $1,299.00 and Amazon Prime renewal for $139.00...",
+      "relevantEmails": 2,
       "tokensUsed": 256
     }
   }
