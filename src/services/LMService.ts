@@ -1,218 +1,379 @@
 import OpenAI from 'openai';
+import { EmailClassificationRequest, EmailClassificationResult, FineTuningStats } from '../types/fine-tuning';
+import { FINE_TUNING_DATASET } from '../data/fine-tuning-dataset';
+import { ChatMessage, ChatCompletionResponse } from '../types/chat';
+import { GenericDBService } from './GenericDBService';
+import { EmailSearchService } from './EmailSearchService';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
-import { EmailSearchService } from './EmailSearchService';
 
-export interface ChatMessage {
-  role: 'system' | 'user' | 'assistant' | 'tool';
-  content: string;
-  tool_calls?: any[];
-  tool_call_id?: string;
-}
-
-export interface CompletionResult {
-  success: boolean;
-  finalResult?: string;
-  error?: string;
-  iterations?: number;
-}
+// Re-export ChatMessage for other services
+export { ChatMessage } from '../types/chat';
 
 export class LMService {
   private openai: OpenAI;
+  private dbService: GenericDBService;
   private emailSearchService: EmailSearchService;
 
   constructor() {
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
+    this.dbService = new GenericDBService();
     this.emailSearchService = new EmailSearchService();
-    Logger.info('🧠 LMService initialized with email search capabilities');
   }
 
   /**
-   * Main completion method that handles the complete do-while logic internally
-   * Centralizes all tool calling logic in one place
+   * Complete chat with OpenAI using messages array and handle tool calling internally
    */
-  async completion(messages: ChatMessage[]): Promise<CompletionResult> {
-    const maxRetries = 5;
-    let currentRetry = 0;
-    const conversationMessages = [...messages];
-    
-    try {
-      do {
-        Logger.debug(`🔄 LMService iteration ${currentRetry + 1}/${maxRetries}`);
-        
-        const response = await this.openai.chat.completions.create({
-          model: config.openai.model,
-          messages: conversationMessages.map(msg => {
-            const baseMessage: any = {
-              role: msg.role,
-              content: msg.content
-            };
-            
-            if (msg.tool_calls) {
-              baseMessage.tool_calls = msg.tool_calls;
-            }
-            
-            if (msg.tool_call_id) {
-              baseMessage.tool_call_id = msg.tool_call_id;
-            }
-            
-            return baseMessage;
-          }),
-          tools: [
-            {
-              type: 'function',
-              function: {
-                name: 'searchEmails',
-                description: 'Buscar emails en la base de datos usando diferentes criterios como remitentes, categorías, montos, etc.',
-                parameters: {
-                  type: 'object',
-                  properties: {
-                    senders: {
-                      type: 'array',
-                      items: { type: 'string' },
-                      description: 'Lista de remitentes a buscar (ej: ["netflix", "amazon"])'
-                    },
-                    subjects: {
-                      type: 'array', 
-                      items: { type: 'string' },
-                      description: 'Lista de palabras clave en el asunto (ej: ["factura", "pago"])'
-                    },
-                    categories: {
-                      type: 'array',
-                      items: { type: 'string' },
-                      description: 'Categorías de gastos: comestibles, entretenimiento, electrónicos, suscripciones, bancos, promociones'
-                    },
-                    merchants: {
-                      type: 'array',
-                      items: { type: 'string' },
-                      description: 'Lista de comerciantes específicos (ej: ["walmart", "spotify"])'
-                    },
-                    minAmount: {
-                      type: 'number',
-                      description: 'Monto mínimo en dólares'
-                    },
-                    maxAmount: {
-                      type: 'number', 
-                      description: 'Monto máximo en dólares'
-                    }
-                  },
-                  required: []
-                }
-              }
-            }
+  async completion(messages: ChatMessage[]): Promise<{ messages: ChatMessage[], success: boolean, finalResult?: any }> {
+    Logger.debug('🤖 Processing completion with model:', config.openai.model);
+
+    const tools = [{
+      type: 'function' as const,
+      function: {
+        name: 'save-email',
+        description: 'Saves the processed email financial data to the database',
+        parameters: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', description: 'ID of the email' },
+            confidence: {
+              type: 'number',
+              minimum: 0,
+              maximum: 1,
+              description: 'The confidence level of the email belongs to financial transactions (0 to 1)',
+            },
+            subject: { type: 'string', description: 'Subject of the email' },
+            name: { type: 'string', maxLength: 30, description: 'Name of the transaction, max 30 characters' },
+            sender: {
+              type: 'object',
+              properties: {
+                name: { type: 'string', description: 'Name of the sender' },
+                email: {
+                  type: 'string',
+                  format: 'email',
+                  description: 'Email address of the sender',
+                },
+              },
+              required: ['name', 'email'],
+            },
+            date: {
+              type: 'string',
+              format: 'date-time',
+              description: 'Date of the transaction in ISO format with time zone',
+            },
+            body: { type: 'string', minLength: 1, description: 'Email body content, cannot be empty' },
+            description: {
+              type: 'string',
+              maxLength: 300,
+              description: 'Description of the transaction, max 300 chars',
+            },
+            type: {
+              type: 'string',
+              enum: ['income', 'expense'],
+              description: 'Type of financial transaction',
+            },
+            amount: {
+              type: 'object',
+              properties: {
+                value: { type: 'number', description: 'Amount value' },
+                currency: { type: 'string', description: 'Currency of the amount' },
+              },
+              required: ['value', 'currency'],
+            },
+          },
+          required: [
+            'id',
+            'confidence',
+            'subject',
+            'sender',
+            'date',
+            'body',
+            'name',
+            'description',
+            'type',
+            'amount',
           ],
-          tool_choice: 'auto',
-          temperature: 0.1,
-        });
-
-        const message = response.choices[0]?.message;
-        if (!message) {
-          throw new Error('No message received from OpenAI');
+        },
+      },
+    }, {
+      type: 'function' as const,
+      function: {
+        name: 'searchEmails',
+        description: 'Buscar emails en la base de datos usando diferentes criterios como remitentes, categorías, montos, etc.',
+        parameters: {
+          type: 'object',
+          properties: {
+            senders: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Lista de remitentes a buscar (ej: ["netflix", "amazon"])'
+            },
+            subjects: {
+              type: 'array', 
+              items: { type: 'string' },
+              description: 'Lista de palabras clave en el asunto (ej: ["factura", "pago"])'
+            },
+            categories: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Categorías de gastos: comestibles, entretenimiento, electrónicos, suscripciones, bancos, promociones'
+            },
+            merchants: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Lista de comerciantes específicos (ej: ["walmart", "spotify"])'
+            },
+            minAmount: {
+              type: 'number',
+              description: 'Monto mínimo en dólares'
+            },
+            maxAmount: {
+              type: 'number', 
+              description: 'Monto máximo en dólares'
+            }
+          },
+          required: []
         }
+      }
+    }];
 
-        // Add assistant message to conversation
-        const assistantMessage: ChatMessage = {
-          role: 'assistant',
-          content: message.content || '',
-          ...(message.tool_calls && { 
-            tool_calls: message.tool_calls.map(tc => ({
+    let maxRetries = 3;
+    let currentRetry = 0;
+    let hasToolCalls = true;
+    const processedCallIds = new Set<string>();
+    const processedEmailIds = new Set<string>();
+    const conversationMessages = [...messages]; // Copy initial messages
+    let finalResult: any = null;
+
+    do {
+      // Convert our ChatMessage type to OpenAI format
+      const openaiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = conversationMessages.map(msg => {
+        if (msg.role === 'tool') {
+          return {
+            role: 'tool',
+            content: msg.content,
+            tool_call_id: msg.tool_call_id!
+          };
+        }
+        
+        if (msg.tool_calls) {
+          return {
+            role: msg.role as 'assistant',
+            content: msg.content,
+            tool_calls: msg.tool_calls.map(tc => ({
               id: tc.id,
               type: tc.type,
               function: tc.function
             }))
-          })
-        };
-        conversationMessages.push(assistantMessage);
-
-        // Process tool calls if any
-        if (message.tool_calls && message.tool_calls.length > 0) {
-          Logger.debug(`🛠️ Processing ${message.tool_calls.length} tool call(s)`);
-
-          for (const toolCall of message.tool_calls) {
-            const functionResult = await this.callFunction(toolCall);
-            
-            const toolMessage: ChatMessage = {
-              role: 'tool',
-              tool_call_id: toolCall.id,
-              content: functionResult
-            };
-            conversationMessages.push(toolMessage);
-          }
-        }
-
-        currentRetry++;
-        const hasMoreToolCalls = message.tool_calls && message.tool_calls.length > 0;
-        
-        // Continue if there are tool calls and we haven't exceeded max retries
-        if (!hasMoreToolCalls || currentRetry >= maxRetries) {
-          const finalContent = message.content || 'Búsqueda completada exitosamente.';
-          
-          return {
-            success: true,
-            finalResult: finalContent,
-            iterations: currentRetry
           };
         }
 
-      } while (currentRetry < maxRetries);
+        return {
+          role: msg.role as 'system' | 'user' | 'assistant',
+          content: msg.content
+        };
+      });
 
-      // If we exit the loop due to max retries
-      return {
-        success: false,
-        finalResult: '',
-        error: `Max retries (${maxRetries}) exceeded`,
-        iterations: currentRetry
-      };
+      const completion = await this.openai.chat.completions.create({
+        model: config.openai.model,
+        messages: openaiMessages,
+        tools,
+        tool_choice: 'auto',
+        temperature: 0.1
+      });
 
+      const assistantMessage = completion.choices[0].message;
+
+      // Add assistant message to conversation
+      conversationMessages.push({
+        role: 'assistant',
+        content: assistantMessage.content || '',
+        tool_calls: assistantMessage.tool_calls?.map(tc => ({
+          id: tc.id,
+          type: tc.type,
+          function: tc.function
+        }))
+      });
+
+      // Check if there are tool calls
+      if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
+        hasToolCalls = false;
+        break;
+      }
+
+      // Process each tool call
+      for (const toolCall of assistantMessage.tool_calls) {
+        // Avoid duplicate calls
+        if (processedCallIds.has(toolCall.id)) {
+          Logger.debug(`⏭️ Skipping duplicate tool call: ${toolCall.id}`);
+          continue;
+        }
+        processedCallIds.add(toolCall.id);
+
+        // Call the function and get result
+        const toolResult = await this.callFunction(toolCall.function.name, toolCall.function.arguments, processedEmailIds);
+
+        // Add tool result to conversation
+        conversationMessages.push({
+          role: 'tool',
+          content: JSON.stringify(toolResult),
+          tool_call_id: toolCall.id
+        });
+
+        // If successful save-email, store the result
+        if (toolResult.success && toolCall.function.name === 'save-email') {
+          try {
+            finalResult = JSON.parse(toolCall.function.arguments);
+          } catch (parseError) {
+            Logger.error('Failed to parse successful tool call arguments:', parseError);
+          }
+        }
+      }
+
+      currentRetry++;
+
+      // Check if we should retry due to errors
+      if (currentRetry >= maxRetries) {
+        Logger.warn(`⚠️ Max retries reached`);
+        hasToolCalls = false;
+      }
+
+    } while (hasToolCalls && currentRetry < maxRetries);
+
+    return {
+      messages: conversationMessages,
+      success: finalResult !== null,
+      finalResult
+    };
+  }
+
+  /**
+   * Call a function by name and handle errors appropriately
+   */
+  async callFunction(functionName: string, argumentsString: string, processedEmailIds: Set<string>): Promise<any> {
+    try {
+      if (functionName === 'save-email') {
+        const args = JSON.parse(argumentsString);
+        
+        // Avoid duplicate email processing
+        if (processedEmailIds.has(args.id)) {
+          Logger.debug(`⏭️ Skipping duplicate email: ${args.id}`);
+          return { success: false, error: 'Email already processed in this session' };
+        }
+        
+        processedEmailIds.add(args.id);
+        return await this.dbService.saveEmail(args);
+      } else if (functionName === 'searchEmails') {
+        const params = JSON.parse(argumentsString);
+        const result = await this.emailSearchService.searchEmails(params);
+        
+        return JSON.stringify({
+          success: true,
+          totalEmails: result.emails.length,
+          totalAmount: result.totalAmount,
+          summary: result.summary,
+          emails: result.emails.map((email: any) => ({
+            title: email.title,
+            amount: email.amount || 0,
+            content: email.content.substring(0, 200) + '...'
+          }))
+        }, null, 2);
+      } else {
+        return { success: false, error: `Unknown function: ${functionName}` };
+      }
     } catch (error) {
-      Logger.error('❌ Error in LMService.completion:', error);
-      return {
-        success: false,
-        finalResult: '',
-        error: error instanceof Error ? error.message : 'Unknown error',
-        iterations: currentRetry
+      return { 
+        success: false, 
+        error: `Tool call failed: ${error instanceof Error ? error.message : String(error)}` 
       };
     }
   }
 
   /**
-   * Handle individual function calls
-   * Encapsulates all tool calling logic in one method
+   * Classify email using the configured model
    */
-  private async callFunction(toolCall: any): Promise<string> {
+  async classifyEmail(request: EmailClassificationRequest): Promise<EmailClassificationResult> {
+    Logger.debug('🤖 Classifying email with model:', config.openai.model);
+
+    const prompt = `Subject: ${request.emailSubject}\nBody: ${request.emailBody}${request.sender ? `\nSender: ${request.sender}` : ''}`;
+
+    const completion = await this.openai.chat.completions.create({
+      model: config.openai.model,
+      messages: [
+        {
+          role: 'system',
+          content: 'Clasifica si este email contiene información de transacciones financieras y extrae detalles relevantes. Responde en formato JSON con: isFinancial (boolean), confidence (0-1), category (string), reasoning (string), y extractedAmount si aplica.'
+        },
+        {
+          role: 'user',
+          content: prompt
+        }
+      ],
+      temperature: 0.1,
+      max_tokens: 300
+    });
+
+    const response = completion.choices[0].message.content || '{}';
+    
     try {
-      const { name, arguments: args } = toolCall.function;
-      
-      Logger.debug(`🔧 Calling function: ${name} with args:`, args);
-
-      switch (name) {
-        case 'searchEmails':
-          const params = JSON.parse(args);
-          const result = await this.emailSearchService.searchEmails(params);
-          
-          return JSON.stringify({
-            success: true,
-            totalEmails: result.emails.length,
-            totalAmount: result.totalAmount,
-            summary: result.summary,
-            emails: result.emails.map(email => ({
-              title: email.title,
-              amount: email.amount || 0,
-              content: email.content.substring(0, 200) + '...'
-            }))
-          }, null, 2);
-
-        default:
-          throw new Error(`Unknown function: ${name}`);
-      }
+      const parsed = JSON.parse(response);
+      return {
+        isFinancial: parsed.isFinancial || false,
+        confidence: parsed.confidence || 0,
+        category: parsed.category || 'unknown',
+        reasoning: parsed.reasoning || 'No reasoning provided',
+        extractedAmount: parsed.extractedAmount
+      };
     } catch (error) {
-      Logger.error(`❌ Error calling function ${toolCall.function.name}:`, error);
-      return JSON.stringify({
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error'
-      });
+      Logger.warn('Failed to parse model response:', response);
+      return {
+        isFinancial: false,
+        confidence: 0.1,
+        category: 'parsing-error',
+        reasoning: 'Failed to parse model response'
+      };
     }
+  }
+
+  /**
+   * Generate training data file for OpenAI fine-tuning (educational purposes)
+   */
+  generateTrainingFile(): string {
+    Logger.info('📝 Generating fine-tuning training file...');
+
+    const trainingData = FINE_TUNING_DATASET.map(dataPoint => JSON.stringify(dataPoint)).join('\n');
+    
+    return trainingData;
+  }
+
+  /**
+   * Get fine-tuning statistics (educational purposes)
+   */
+  getFineTuningStats(): FineTuningStats {
+    const totalExamples = FINE_TUNING_DATASET.length;
+    const financialExamples = FINE_TUNING_DATASET.filter(example => 
+      example.messages.find(msg => msg.role === 'assistant')?.content.includes('"isFinancial": true')
+    ).length;
+
+    // Simulated metrics - en producción, estos vendrían de evaluaciones reales
+    const baseAccuracy = 0.72; // Precisión típica de modelo base
+    const fineTunedAccuracy = 0.89; // Precisión después de fine-tuning
+    const improvement = ((fineTunedAccuracy - baseAccuracy) / baseAccuracy) * 100;
+
+    return {
+      totalTrainingExamples: totalExamples,
+      baseModelAccuracy: baseAccuracy,
+      fineTunedAccuracy: fineTunedAccuracy,
+      improvementPercentage: Math.round(improvement * 100) / 100
+    };
+  }
+
+  /**
+   * Get current model being used
+   */
+  getCurrentModel(): string {
+    return config.openai.model;
   }
 }

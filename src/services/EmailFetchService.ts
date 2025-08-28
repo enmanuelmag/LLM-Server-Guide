@@ -60,12 +60,12 @@ export class EmailFetchService {
           // Additional metadata can be extracted from the result if needed
         };
       } else {
-        Logger.error('❌ Email search failed:', result.error);
+        Logger.error('❌ Email search failed');
         
         return {
           success: false,
           response: 'No pude completar la búsqueda de emails.',
-          error: result.error
+          error: 'Search failed'
         };
       }
 
