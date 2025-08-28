@@ -7,7 +7,7 @@
     "4. Expected: Audio MP3 file response with spoken answer about Starbucks promotions from emails"
   ],
   "endpoints": {
-    "url": "/rag/query-voice-to-voice", 
+    "url": "/rag/query-voice-to-voice",
     "method": "POST",
     "contentType": "multipart/form-data",
     "field": "audio"
@@ -23,7 +23,7 @@
     "contentType": "audio/mpeg",
     "headers": {
       "X-Transcribed-Query": "Original transcribed question",
-      "X-Response-Length": "Length of text response", 
+      "X-Response-Length": "Length of text response",
       "X-Relevant-Emails": "Number of relevant emails found",
       "X-Processing-Timestamp": "ISO timestamp"
     },

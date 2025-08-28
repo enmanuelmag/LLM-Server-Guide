@@ -1,5 +1,5 @@
-// Financial Policies Vector Store Interface
-export interface FinancialPolicy {
+// Email Data Vector Store Interface
+export interface EmailData {
   id: string;
   title: string;
   content: string;
@@ -15,6 +15,6 @@ export interface VectorStoreQuery {
 }
 
 export interface VectorSearchResult {
-  policy: FinancialPolicy;
+  email: EmailData;
   similarity: number;
 }
