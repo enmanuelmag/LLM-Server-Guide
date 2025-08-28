@@ -310,14 +310,14 @@ router.post(
 // Get all emails (formerly policies)
 router.get('/policies', (req, res) => {
   try {
-    const { FINANCIAL_POLICIES } = require('../data/financial-policies');
+    const { EMAIL_DATABASE } = require('../data/email-mock-data');
 
     res.json({
       success: true,
-      totalEmails: FINANCIAL_POLICIES.length,
+      totalEmails: EMAIL_DATABASE.length,
       branch: '5-fetch-emails',
       description: 'Email database for spending analysis',
-      emails: FINANCIAL_POLICIES.map((email: any) => ({
+      emails: EMAIL_DATABASE.map((email: any) => ({
         id: email.id,
         title: email.title,
         category: email.category,
@@ -338,22 +338,22 @@ router.get('/policies', (req, res) => {
 // Get Enhanced RAG statistics
 router.get('/stats', (req, res) => {
   try {
-    const { FINANCIAL_POLICIES } = require('../data/financial-policies');
+    const { EMAIL_DATABASE } = require('../data/email-mock-data');
     const categories = emailSearchService.getAvailableCategories();
     const senders = emailSearchService.getAvailableSenders();
 
     const stats = {
-      totalEmails: FINANCIAL_POLICIES.length,
+      totalEmails: EMAIL_DATABASE.length,
       categories: categories,
       senders: senders,
-      embeddingDimension: FINANCIAL_POLICIES[0]?.embedding?.length || 0,
+      embeddingDimension: EMAIL_DATABASE[0]?.embedding?.length || 0,
       averageContentLength:
-        FINANCIAL_POLICIES.length > 0
+        EMAIL_DATABASE.length > 0
           ? Math.round(
-              FINANCIAL_POLICIES.reduce(
+              EMAIL_DATABASE.reduce(
                 (sum: number, email: any) => sum + email.content.length,
                 0
-              ) / FINANCIAL_POLICIES.length
+              ) / EMAIL_DATABASE.length
             )
           : 0,
       enhancedFeatures: [

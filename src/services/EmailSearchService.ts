@@ -9,7 +9,7 @@ import {
   EmailSearchResult,
 } from '../types/function-calling';
 import { EmailData } from '../types/rag';
-import { EMAIL_DATABASE } from '../data/financial-policies';
+import { EMAIL_DATABASE } from '../data/email-mock-data';
 
 export class EmailSearchService {
   private emails: EmailData[];
