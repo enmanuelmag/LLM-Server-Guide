@@ -136,19 +136,34 @@ npm run dev
 
 ## 📁 Colección de Postman
 
-Importa `Email-Processor-Workshop-v2-Postman-Collection.json` en Postman:
+**⚠️ NUEVA UBICACIÓN:** La colección de Postman ahora está **FUERA** del repositorio para uso universal.
 
-1. **Variables de entorno:**
+**Ubicación:** `/Users/sadie/Code/Innova-T/Email-Processor-Workshop-v2-COMPLETE-Postman-Collection.json`
+
+**Importar en Postman:**
+
+1. **Abrir Postman** → File → Import
+2. **Seleccionar archivo:** `Email-Processor-Workshop-v2-COMPLETE-Postman-Collection.json`
+3. **Configurar variables:**
    - `baseUrl`: `http://localhost`
    - `port`: `3000`
 
-2. **Organización:**
-   - 🏠 Sistema Base (Rama 1+)
-   - 🧠 RAG (Rama 2+) 
-   - 🎯 Fine-tuning (Rama 3+)
-   - ⚙️ Email Processing (Rama 4+)
-   - 🤖 Enhanced RAG (Rama 5+)
-   - 🛡️ Moderation (Rama 6+)
+**Organización:**
+   - 🏠 Rama 1: Basic Setup (Disponible en todas las ramas)
+   - 🧠 Rama 2: RAG Implementation (Rama 2+)
+   - 🎯 Rama 3: Fine-tuning (Rama 3+)
+   - ⚙️ Rama 4: Email Processing (Rama 4+)
+   - 🤖 Rama 5: Enhanced RAG (Rama 5+)
+   - 🛡️ Rama 6: API Moderation (Rama 6+)
+
+**Ventajas:**
+- ✅ Una sola colección para todo el workshop
+- ✅ Documentación completa de cada endpoint
+- ✅ Ejemplos listos para usar
+- ✅ Progresión clara por rama
+- ✅ Siempre actualizada
+
+**Ver:** `/Users/sadie/Code/Innova-T/POSTMAN-COLLECTION-GUIDE.md` para guía completa de uso.
 
 ## ⚠️ Notas Importantes
 
