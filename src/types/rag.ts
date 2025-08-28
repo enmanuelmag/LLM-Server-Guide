@@ -7,6 +7,7 @@ export const RagEmailDataSchema = z.object({
   title: z.string(),
   content: z.string(),
   category: z.string(),
+  date: z.string(),
   embedding: z.array(z.number()),
 });
 export type EmailData = z.infer<typeof RagEmailDataSchema>;
