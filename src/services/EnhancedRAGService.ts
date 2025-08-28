@@ -139,9 +139,9 @@ Siempre proporciona respuestas útiles, específicas y en español. Incluye mont
     const context = results
       .map(
         (result) =>
-          `Email: ${result.policy.title}\nDe: ${
-            result.policy.content.split('\n')[0] || 'N/A'
-          }\nContenido: ${result.policy.content}`
+          `Email: ${result.email.title}\nDe: ${
+            result.email.content.split('\n')[0] || 'N/A'
+          }\nContenido: ${result.email.content}`
       )
       .join('\n\n---\n\n');
 

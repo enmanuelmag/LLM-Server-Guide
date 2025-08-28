@@ -8,14 +8,14 @@ import {
   EmailSearchParams,
   EmailSearchResult,
 } from '../types/function-calling';
-import { FinancialPolicy } from '../types/rag';
-import { FINANCIAL_POLICIES } from '../data/financial-policies';
+import { EmailData } from '../types/rag';
+import { EMAIL_DATABASE } from '../data/financial-policies';
 
 export class EmailSearchService {
-  private emails: FinancialPolicy[];
+  private emails: EmailData[];
 
   constructor() {
-    this.emails = FINANCIAL_POLICIES as FinancialPolicy[];
+    this.emails = EMAIL_DATABASE as EmailData[];
     Logger.info(
       '📧 Email Search Service initialized with',
       this.emails.length,
