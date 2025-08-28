@@ -1,7 +1,7 @@
 {
   "instructions": "GET to /docs - Documentation endpoint with branch information",
   "endpoint": "http://localhost:3000/docs",
-  "method": "GET", 
+  "method": "GET",
   "description": "Returns workshop documentation and branch progression information",
   "expected_response": {
     "workshop": "Email Processor Workshop v2",
@@ -13,7 +13,7 @@
     },
     "currentFeatures": [
       "Express server setup",
-      "TypeScript configuration", 
+      "TypeScript configuration",
       "OpenAI SDK integration",
       "Basic logging system"
     ]
