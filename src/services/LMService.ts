@@ -117,7 +117,8 @@ export class LMService {
         type: 'function' as const,
         function: {
           name: 'search-emails',
-          description: 'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
+          description:
+            'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
           parameters: {
             type: 'object',
             properties: {
@@ -216,6 +217,7 @@ export class LMService {
         !assistantMessage.tool_calls ||
         assistantMessage.tool_calls.length === 0
       ) {
+        Logger.info('No tool calls found');
         hasToolCalls = false;
         // Capture the final LLM response
         finalResult = {
@@ -297,6 +299,7 @@ export class LMService {
           2
         );
       } else {
+        Logger.error(`Unknown function: ${functionName}`);
         return { success: false, error: `Unknown function: ${functionName}` };
       }
     } catch (error) {
