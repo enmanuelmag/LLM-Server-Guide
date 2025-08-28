@@ -2,22 +2,25 @@ import OpenAI from 'openai';
 import { EmailClassificationRequest, EmailClassificationResult, FineTuningStats } from '../types/fine-tuning';
 import { FINE_TUNING_DATASET } from '../data/fine-tuning-dataset';
 import { ChatMessage, ChatCompletionResponse } from '../types/chat';
+import { GenericDBService } from './GenericDBService';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class LMService {
   private openai: OpenAI;
+  private dbService: GenericDBService;
 
   constructor() {
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
+    this.dbService = new GenericDBService();
   }
 
   /**
-   * Complete chat with OpenAI using messages array
+   * Complete chat with OpenAI using messages array and handle tool calling internally
    */
-  async completion(messages: ChatMessage[]): Promise<ChatCompletionResponse> {
+  async completion(messages: ChatMessage[]): Promise<{ messages: ChatMessage[], success: boolean, finalResult?: any }> {
     Logger.debug('🤖 Processing completion with model:', config.openai.model);
 
     const tools = [{
@@ -90,56 +93,141 @@ export class LMService {
       },
     }];
 
-    // Convert our ChatMessage type to OpenAI format
-    const openaiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = messages.map(msg => {
-      if (msg.role === 'tool') {
-        return {
-          role: 'tool',
-          content: msg.content,
-          tool_call_id: msg.tool_call_id!
-        };
-      }
-      
-      if (msg.tool_calls) {
-        return {
-          role: msg.role as 'assistant',
-          content: msg.content,
-          tool_calls: msg.tool_calls.map(tc => ({
-            id: tc.id,
-            type: tc.type,
-            function: tc.function
-          }))
-        };
-      }
+    let maxRetries = 3;
+    let currentRetry = 0;
+    let hasToolCalls = true;
+    const processedCallIds = new Set<string>();
+    const processedEmailIds = new Set<string>();
+    const conversationMessages = [...messages]; // Copy initial messages
+    let finalResult: any = null;
 
-      return {
-        role: msg.role as 'system' | 'user' | 'assistant',
-        content: msg.content
-      };
-    });
-
-    const completion = await this.openai.chat.completions.create({
-      model: config.openai.model,
-      messages: openaiMessages,
-      tools,
-      tool_choice: 'auto',
-      temperature: 0.1
-    });
-
-    // Convert back to our format
-    return {
-      choices: completion.choices.map(choice => ({
-        message: {
-          role: 'assistant' as const,
-          content: choice.message.content,
-          tool_calls: choice.message.tool_calls?.map(tc => ({
-            id: tc.id,
-            type: tc.type,
-            function: tc.function
-          }))
+    do {
+      // Convert our ChatMessage type to OpenAI format
+      const openaiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = conversationMessages.map(msg => {
+        if (msg.role === 'tool') {
+          return {
+            role: 'tool',
+            content: msg.content,
+            tool_call_id: msg.tool_call_id!
+          };
         }
-      }))
+        
+        if (msg.tool_calls) {
+          return {
+            role: msg.role as 'assistant',
+            content: msg.content,
+            tool_calls: msg.tool_calls.map(tc => ({
+              id: tc.id,
+              type: tc.type,
+              function: tc.function
+            }))
+          };
+        }
+
+        return {
+          role: msg.role as 'system' | 'user' | 'assistant',
+          content: msg.content
+        };
+      });
+
+      const completion = await this.openai.chat.completions.create({
+        model: config.openai.model,
+        messages: openaiMessages,
+        tools,
+        tool_choice: 'auto',
+        temperature: 0.1
+      });
+
+      const assistantMessage = completion.choices[0].message;
+
+      // Add assistant message to conversation
+      conversationMessages.push({
+        role: 'assistant',
+        content: assistantMessage.content || '',
+        tool_calls: assistantMessage.tool_calls?.map(tc => ({
+          id: tc.id,
+          type: tc.type,
+          function: tc.function
+        }))
+      });
+
+      // Check if there are tool calls
+      if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
+        hasToolCalls = false;
+        break;
+      }
+
+      // Process each tool call
+      for (const toolCall of assistantMessage.tool_calls) {
+        // Avoid duplicate calls
+        if (processedCallIds.has(toolCall.id)) {
+          Logger.debug(`⏭️ Skipping duplicate tool call: ${toolCall.id}`);
+          continue;
+        }
+        processedCallIds.add(toolCall.id);
+
+        // Call the function and get result
+        const toolResult = await this.callFunction(toolCall.function.name, toolCall.function.arguments, processedEmailIds);
+
+        // Add tool result to conversation
+        conversationMessages.push({
+          role: 'tool',
+          content: JSON.stringify(toolResult),
+          tool_call_id: toolCall.id
+        });
+
+        // If successful save-email, store the result
+        if (toolResult.success && toolCall.function.name === 'save-email') {
+          try {
+            finalResult = JSON.parse(toolCall.function.arguments);
+          } catch (parseError) {
+            Logger.error('Failed to parse successful tool call arguments:', parseError);
+          }
+        }
+      }
+
+      currentRetry++;
+
+      // Check if we should retry due to errors
+      if (currentRetry >= maxRetries) {
+        Logger.warn(`⚠️ Max retries reached`);
+        hasToolCalls = false;
+      }
+
+    } while (hasToolCalls && currentRetry < maxRetries);
+
+    return {
+      messages: conversationMessages,
+      success: finalResult !== null,
+      finalResult
     };
+  }
+
+  /**
+   * Call a function by name and handle errors appropriately
+   */
+  async callFunction(functionName: string, argumentsString: string, processedEmailIds: Set<string>): Promise<any> {
+    try {
+      if (functionName === 'save-email') {
+        const args = JSON.parse(argumentsString);
+        
+        // Avoid duplicate email processing
+        if (processedEmailIds.has(args.id)) {
+          Logger.debug(`⏭️ Skipping duplicate email: ${args.id}`);
+          return { success: false, error: 'Email already processed in this session' };
+        }
+        
+        processedEmailIds.add(args.id);
+        return await this.dbService.saveEmail(args);
+      } else {
+        return { success: false, error: `Unknown function: ${functionName}` };
+      }
+    } catch (error) {
+      return { 
+        success: false, 
+        error: `Tool call failed: ${error instanceof Error ? error.message : String(error)}` 
+      };
+    }
   }
 
   /**
