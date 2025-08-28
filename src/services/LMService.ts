@@ -1,6 +1,4 @@
 import OpenAI from 'openai';
-import { EmailClassificationRequest, EmailClassificationResult, FineTuningStats } from '../types/fine-tuning';
-import { FINE_TUNING_DATASET } from '../data/fine-tuning-dataset';
 import { ChatMessage, ChatCompletionResponse } from '../types/chat';
 import { GenericDBService } from './GenericDBService';
 import { EmailSearchService } from './EmailSearchService';
@@ -143,7 +141,6 @@ export class LMService {
     let currentRetry = 0;
     let hasToolCalls = true;
     const processedCallIds = new Set<string>();
-    const processedEmailIds = new Set<string>();
     const conversationMessages = [...messages]; // Copy initial messages
     let finalResult: any = null;
 
@@ -200,6 +197,11 @@ export class LMService {
       // Check if there are tool calls
       if (!assistantMessage.tool_calls || assistantMessage.tool_calls.length === 0) {
         hasToolCalls = false;
+        // Capture the final LLM response
+        finalResult = {
+          content: assistantMessage.content || '',
+          role: 'assistant'
+        };
         break;
       }
 
@@ -213,7 +215,7 @@ export class LMService {
         processedCallIds.add(toolCall.id);
 
         // Call the function and get result
-        const toolResult = await this.callFunction(toolCall.function.name, toolCall.function.arguments, processedEmailIds);
+        const toolResult = await this.callFunction(toolCall.function.name, toolCall.function.arguments);
 
         // Add tool result to conversation
         conversationMessages.push({
@@ -221,15 +223,6 @@ export class LMService {
           content: JSON.stringify(toolResult),
           tool_call_id: toolCall.id
         });
-
-        // If successful save-email, store the result
-        if (toolResult.success && toolCall.function.name === 'save-email') {
-          try {
-            finalResult = JSON.parse(toolCall.function.arguments);
-          } catch (parseError) {
-            Logger.error('Failed to parse successful tool call arguments:', parseError);
-          }
-        }
       }
 
       currentRetry++;
@@ -252,18 +245,10 @@ export class LMService {
   /**
    * Call a function by name and handle errors appropriately
    */
-  async callFunction(functionName: string, argumentsString: string, processedEmailIds: Set<string>): Promise<any> {
+  async callFunction(functionName: string, argumentsString: string): Promise<any> {
     try {
       if (functionName === 'save-email') {
         const args = JSON.parse(argumentsString);
-        
-        // Avoid duplicate email processing
-        if (processedEmailIds.has(args.id)) {
-          Logger.debug(`⏭️ Skipping duplicate email: ${args.id}`);
-          return { success: false, error: 'Email already processed in this session' };
-        }
-        
-        processedEmailIds.add(args.id);
         return await this.dbService.saveEmail(args);
       } else if (functionName === 'searchEmails') {
         const params = JSON.parse(argumentsString);
@@ -294,82 +279,6 @@ export class LMService {
   /**
    * Classify email using the configured model
    */
-  async classifyEmail(request: EmailClassificationRequest): Promise<EmailClassificationResult> {
-    Logger.debug('🤖 Classifying email with model:', config.openai.model);
-
-    const prompt = `Subject: ${request.emailSubject}\nBody: ${request.emailBody}${request.sender ? `\nSender: ${request.sender}` : ''}`;
-
-    const completion = await this.openai.chat.completions.create({
-      model: config.openai.model,
-      messages: [
-        {
-          role: 'system',
-          content: 'Clasifica si este email contiene información de transacciones financieras y extrae detalles relevantes. Responde en formato JSON con: isFinancial (boolean), confidence (0-1), category (string), reasoning (string), y extractedAmount si aplica.'
-        },
-        {
-          role: 'user',
-          content: prompt
-        }
-      ],
-      temperature: 0.1,
-      max_tokens: 300
-    });
-
-    const response = completion.choices[0].message.content || '{}';
-    
-    try {
-      const parsed = JSON.parse(response);
-      return {
-        isFinancial: parsed.isFinancial || false,
-        confidence: parsed.confidence || 0,
-        category: parsed.category || 'unknown',
-        reasoning: parsed.reasoning || 'No reasoning provided',
-        extractedAmount: parsed.extractedAmount
-      };
-    } catch (error) {
-      Logger.warn('Failed to parse model response:', response);
-      return {
-        isFinancial: false,
-        confidence: 0.1,
-        category: 'parsing-error',
-        reasoning: 'Failed to parse model response'
-      };
-    }
-  }
-
-  /**
-   * Generate training data file for OpenAI fine-tuning (educational purposes)
-   */
-  generateTrainingFile(): string {
-    Logger.info('📝 Generating fine-tuning training file...');
-
-    const trainingData = FINE_TUNING_DATASET.map(dataPoint => JSON.stringify(dataPoint)).join('\n');
-    
-    return trainingData;
-  }
-
-  /**
-   * Get fine-tuning statistics (educational purposes)
-   */
-  getFineTuningStats(): FineTuningStats {
-    const totalExamples = FINE_TUNING_DATASET.length;
-    const financialExamples = FINE_TUNING_DATASET.filter(example => 
-      example.messages.find(msg => msg.role === 'assistant')?.content.includes('"isFinancial": true')
-    ).length;
-
-    // Simulated metrics - en producción, estos vendrían de evaluaciones reales
-    const baseAccuracy = 0.72; // Precisión típica de modelo base
-    const fineTunedAccuracy = 0.89; // Precisión después de fine-tuning
-    const improvement = ((fineTunedAccuracy - baseAccuracy) / baseAccuracy) * 100;
-
-    return {
-      totalTrainingExamples: totalExamples,
-      baseModelAccuracy: baseAccuracy,
-      fineTunedAccuracy: fineTunedAccuracy,
-      improvementPercentage: Math.round(improvement * 100) / 100
-    };
-  }
-
   /**
    * Get current model being used
    */
