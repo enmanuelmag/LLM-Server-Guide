@@ -1,8 +1,8 @@
 {
-  "query": "What are the fees for international transfers over $10,000?",
+  "query": "¿Cuándo se procesaron las compras de Amazon?",
   "instructions": [
-    "Test specific fee inquiry",
+    "Test specific purchase inquiry",
     "Send POST to /rag/query", 
-    "Expected: Detailed fee structure from policies"
+    "Expected: Detailed information about Amazon purchases from email receipts"
   ]
 }
