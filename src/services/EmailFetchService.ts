@@ -6,6 +6,7 @@
 
 import { Logger } from '../utils/logger';
 import { LMService, ChatMessage } from './LMService';
+import { EMAIL_FETCH_PROMPT } from '../constants/email-fetch';
 
 export interface EmailFetchRequest {
   userQuery: string;
@@ -40,12 +41,12 @@ export class EmailFetchService {
       const messages: ChatMessage[] = [
         {
           role: 'system',
-          content: this.getEmailSearchSystemPrompt()
+          content: EMAIL_FETCH_PROMPT,
         },
         {
           role: 'user',
-          content: this.formatUserQuery(request)
-        }
+          content: this.formatUserQuery(request),
+        },
       ];
 
       // Use centralized completion method that handles do-while internally
@@ -53,7 +54,7 @@ export class EmailFetchService {
 
       if (result.success) {
         Logger.info('✅ Email search completed successfully');
-        
+
         return {
           success: true,
           response: result.finalResult || 'Búsqueda completada',
@@ -61,60 +62,22 @@ export class EmailFetchService {
         };
       } else {
         Logger.error('❌ Email search failed');
-        
+
         return {
           success: false,
           response: 'No pude completar la búsqueda de emails.',
-          error: 'Search failed'
+          error: 'Search failed',
         };
       }
-
     } catch (error) {
       Logger.error('❌ Error in EmailFetchService:', error);
-      
+
       return {
         success: false,
         response: 'Ocurrió un error interno al procesar la búsqueda.',
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
       };
     }
-  }
-
-  /**
-   * System prompt specifically designed for email search functionality
-   */
-  private getEmailSearchSystemPrompt(): string {
-    return `Eres un asistente especializado en búsqueda de emails financieros. Tu trabajo es ayudar a los usuarios a encontrar emails específicos en su base de datos usando los criterios que proporcionen.
-
-INSTRUCCIONES IMPORTANTES:
-1. Analiza la consulta del usuario para identificar criterios de búsqueda como:
-   - Remitentes específicos (Netflix, Amazon, etc.)
-   - Categorías de gastos (comestibles, entretenimiento, electrónicos, etc.)
-   - Rangos de montos (mínimo, máximo)
-   - Comerciantes específicos
-   - Palabras clave en asuntos
-
-2. Utiliza la función searchEmails con los parámetros apropiados basados en la consulta.
-
-3. Presenta los resultados de manera clara y organizada, incluyendo:
-   - Número de emails encontrados
-   - Monto total si es relevante
-   - Resumen de los criterios aplicados
-   - Lista de emails más relevantes
-
-4. Si la búsqueda no arroja resultados, sugiere criterios alternativos o más amplios.
-
-5. Siempre responde en español y de manera amigable.
-
-CATEGORÍAS DISPONIBLES:
-- comestibles: Gastos en comida y supermercados
-- entretenimiento: Netflix, Spotify, servicios de streaming
-- electrónicos: Amazon, gadgets, tecnología
-- suscripciones: Servicios mensuales recurrentes
-- bancos: Comunicaciones bancarias
-- promociones: Ofertas y descuentos
-
-Procede a analizar la consulta del usuario y realizar la búsqueda apropiada.`;
   }
 
   /**
@@ -122,11 +85,11 @@ Procede a analizar la consulta del usuario y realizar la búsqueda apropiada.`;
    */
   private formatUserQuery(request: EmailFetchRequest): string {
     let formattedQuery = request.userQuery;
-    
+
     if (request.context) {
       formattedQuery += `\n\nContexto adicional: ${request.context}`;
     }
-    
+
     return formattedQuery;
   }
 }
