@@ -1,6 +1,6 @@
 import OpenAI from 'openai';
 import { EmailData, VectorStoreQuery, VectorSearchResult } from '../types/rag';
-import { EMAIL_DATABASE } from '../data/financial-policies';
+import { EMAIL_DATABASE } from '../data/email-mock-data';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
