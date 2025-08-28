@@ -7,8 +7,8 @@ import { RAGService } from './services/RAGService';
 import fineTuningRoutes from './routes/fine-tuning';
 import ragRoutes from './routes/rag';
 import emailProcessingRoutes from './routes/email-processing';
-import moderationRoutes from './routes/moderation';
 import emailRoutes from './routes/emails';
+import moderationRoutes from './routes/moderation';
 
 const app = express();
 const ragService = new RAGService();
@@ -20,9 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 // Route modules
 app.use('/fine-tuning', fineTuningRoutes);
 app.use('/rag', ragRoutes);
-app.use('/email-processing', emailProcessingRoutes);
-app.use('/moderation', moderationRoutes);
+app.use('/email', emailProcessingRoutes);
 app.use('/emails', emailRoutes);
+app.use('/moderation', moderationRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -39,13 +39,12 @@ app.get('/', (req, res) => {
   res.json({
     message: '🎓 Email Processor Workshop v2 - OpenAI API Practitioner',
     description: 'Progressive learning through 6 branches: Basic → RAG → Fine-tuning → Email Processing → Enhanced RAG → Moderation',
-    currentBranch: '6-api-moderation',
+    currentBranch: '4-email-processor',
     features: [
       'RAG with Email Database',
       'LM Service for email classification',
       'Complete email processing pipeline',
-      'OpenAI Moderation API for content safety',
-      'Content filtering and risk assessment'
+      'Email simulation and statistics'
     ],
     endpoints: {
       'GET /': 'Workshop overview',
@@ -59,12 +58,9 @@ app.get('/', (req, res) => {
       'POST /email/process': 'Process single email',
       'POST /email/simulate': 'Simulate multiple emails',
       'GET /email/processed': 'Get all processed emails',
-      'GET /email/stats': 'Processing statistics',
-      'POST /api/moderation/text': 'Moderate text content',
-      'POST /api/moderation/email': 'Moderate email content',
-      'POST /api/moderation/demo': 'Demo different moderation scenarios'
+      'GET /email/stats': 'Processing statistics'
     },
-    nextStep: 'Workshop complete! You have mastered all OpenAI API components',
+    nextStep: 'Switch to branch 5-api-moderation for content safety',
     documentation: '/docs'
   });
 });
@@ -74,23 +70,21 @@ app.get('/docs', (req, res) => {
   res.json({
     workshop: 'Email Processor Workshop v2',
     certification: 'OpenAI API Practitioner',
-    currentBranch: '6-api-moderation',
-    implementation: 'Complete Email Processing with Content Moderation',
+    currentBranch: '4-email-processor',
+    implementation: 'Complete Email Processing Pipeline',
     features: [
       'Intelligent email classification with LM Service',
       'RAG-powered email validation',
       'Complete processing pipeline with statistics',
-      'Email simulation for testing',
-      'Content moderation for safety and compliance',
-      'Risk assessment and content filtering'
+      'Email simulation for testing'
     ],
     branches: {
       '1-initial-project': '✅ Basic setup with OpenAI SDK configuration',
       '2-rag-embedding': '✅ RAG implementation with Email Database',
       '3-fine-tuning': '✅ LM Service with configurable models',
-      '4-email-processor': '✅ Complete email processing simulation',
-      '5-fetch-emails': '✅ Enhanced RAG with Function Calling',
-      '6-api-moderation': '🔄 Content moderation and safety compliance'
+      '4-email-processor': '🔄 Complete email processing simulation',
+      '5-fetch-emails': '📋 Enhanced RAG with Function Calling',
+      '6-api-moderation': '📋 Content moderation and safety'
     },
     routes: {
       fineTuning: {
@@ -111,20 +105,7 @@ app.get('/docs', (req, res) => {
         'GET /email/processed/:id': 'Get processed email by ID',
         'GET /email/processed': 'Get all processed emails',
         'GET /email/stats': 'Processing statistics and metrics'
-      },
-      moderation: {
-        'POST /api/moderation/text': 'Moderate any text content for safety',
-        'POST /api/moderation/email': 'Moderate email subject and body',
-        'POST /api/moderation/demo': 'Demo various moderation scenarios with examples'
       }
-    },
-    moderationCategories: {
-      'harassment': 'Bullying, threatening, or hostile content',
-      'hate': 'Discriminatory or hateful content targeting groups',
-      'self-harm': 'Content promoting self-injury or suicide',
-      'sexual': 'Sexually explicit or inappropriate content',
-      'violence': 'Content depicting or promoting violence',
-      'harassment/threatening': 'Harassment combined with threats'
     }
   });
 });
@@ -137,10 +118,9 @@ app.use('*', (req, res) => {
       '/', '/health', '/docs',
       '/rag/query', '/rag/emails', '/rag/stats',
       '/fine-tuning/classify-base', '/fine-tuning/compare', '/fine-tuning/stats', '/fine-tuning/dataset',
-      '/email/process', '/email/simulate', '/email/processed', '/email/stats',
-      '/api/moderation/text', '/api/moderation/email', '/api/moderation/demo'
+      '/email/process', '/email/simulate', '/email/processed', '/email/stats'
     ],
-    hint: 'This is branch 6-api-moderation. Try POST /api/moderation/demo to see content safety in action!'
+    hint: 'This is branch 4-email-processor. Try POST /email/simulate to test the complete pipeline!'
   });
 });
 
@@ -161,13 +141,13 @@ async function startServer() {
     
     app.listen(config.server.port, () => {
       Logger.success(`🚀 Email Processor Workshop v2 running on port ${config.server.port}`);
-      Logger.info(`📚 Workshop branch: 5-api-moderation`);
+      Logger.info(`📚 Workshop branch: 4-email-processor`);
       Logger.info(`🔗 Visit: http://localhost:${config.server.port}`);
       Logger.info(`📖 Documentation: http://localhost:${config.server.port}/docs`);
       Logger.info(`📧 Process email: POST /email/process`);
       Logger.info(`🎲 Simulate emails: POST /email/simulate`);
-      Logger.info(`🛡️ Moderate content: POST /api/moderation/demo`);
-      Logger.info(`🎯 Workshop complete! You mastered all OpenAI API components`);
+      Logger.info(`📊 View stats: GET /email/stats`);
+      Logger.info(`🎯 Next: Switch to branch 5-api-moderation for content safety`);
     });
   } catch (error) {
     Logger.error('Failed to start server:', error);

@@ -56,7 +56,7 @@ export class EmailFetchService {
         
         return {
           success: true,
-          response: result.finalResult ? String(result.finalResult) : 'Búsqueda completada',
+          response: result.finalResult || 'Búsqueda completada',
           // Additional metadata can be extracted from the result if needed
         };
       } else {
