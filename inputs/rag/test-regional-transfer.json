@@ -1,8 +1,0 @@
-{
-  "query": "¿Qué transferencias bancarias he hecho este mes?",
-  "instructions": [
-    "Test bank transfer history query",
-    "Send POST to /rag/query",
-    "Expected: Information about Wells Fargo transfers and other bank movements from email notifications"
-  ]
-}

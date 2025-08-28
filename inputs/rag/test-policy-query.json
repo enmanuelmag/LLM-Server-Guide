@@ -1,8 +1,0 @@
-{
-  "query": "¿Cuánto gasté en suscripciones este mes?",
-  "instructions": [
-    "Test RAG query with simulated financial emails",
-    "Send POST to /rag/query",
-    "Expected: Response finding Netflix, Spotify, and other subscription charges from email database"
-  ]
-}
