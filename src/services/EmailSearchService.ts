@@ -160,6 +160,7 @@ export class EmailSearchService {
 
     return {
       emails: finalEmails,
+      totalEmails: finalEmails.length,
       totalAmount,
       summary,
       searchParams: params,
