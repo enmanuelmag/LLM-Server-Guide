@@ -1,4 +1,7 @@
-import { EmailSearchParams, EmailSearchResult } from '../types/function-calling';
+import {
+  EmailSearchParams,
+  EmailSearchResult,
+} from '../types/function-calling';
 import { EMAIL_DATABASE } from '../data/email-mock-data';
 import { Logger } from '../utils/logger';
 
@@ -8,14 +11,16 @@ export class EmailSearchService {
   constructor() {
     // Initialize with EMAIL_DATABASE
     this.emails = EMAIL_DATABASE;
-    Logger.info(`📚 Email database initialized with ${this.emails.length} emails`);
+    Logger.info(
+      `📚 Email database initialized with ${this.emails.length} emails`
+    );
   }
 
   /**
-   * Search emails based on simplified parameters: sender, subject, dateRange
+   * Search emails based on simplified parameters: sender, dateRange
    */
   async searchEmails(params: EmailSearchParams): Promise<EmailSearchResult> {
-    Logger.debug(
+    Logger.info(
       '🔍 Searching emails with params:',
       JSON.stringify(params, null, 2)
     );
@@ -24,23 +29,13 @@ export class EmailSearchService {
 
     // Filter by sender
     if (params.sender) {
-      filteredEmails = filteredEmails.filter((email) =>
-        email.title.toLowerCase().includes(params.sender!.toLowerCase()) ||
-        email.content.toLowerCase().includes(params.sender!.toLowerCase())
+      filteredEmails = filteredEmails.filter(
+        (email) =>
+          email.title.toLowerCase().includes(params.sender!.toLowerCase()) ||
+          email.content.toLowerCase().includes(params.sender!.toLowerCase())
       );
       Logger.debug(
         `📧 Filtered by sender: ${filteredEmails.length} emails remaining`
-      );
-    }
-
-    // Filter by subject
-    if (params.subject) {
-      filteredEmails = filteredEmails.filter((email) =>
-        email.title.toLowerCase().includes(params.subject!.toLowerCase()) ||
-        email.content.toLowerCase().includes(params.subject!.toLowerCase())
-      );
-      Logger.debug(
-        `🏷️ Filtered by subject: ${filteredEmails.length} emails remaining`
       );
     }
 
@@ -48,7 +43,7 @@ export class EmailSearchService {
     if (params.dateRange) {
       const startDate = new Date(params.dateRange.start);
       const endDate = new Date(params.dateRange.end);
-      
+
       filteredEmails = filteredEmails.filter((email) => {
         const emailDate = new Date(email.date);
         return emailDate >= startDate && emailDate <= endDate;
@@ -59,7 +54,7 @@ export class EmailSearchService {
     }
 
     Logger.info(
-      `✅ Email search completed: ${filteredEmails.length} emails found`
+      `✅ Inner Email search completed: ${filteredEmails.length} emails found`
     );
 
     return {

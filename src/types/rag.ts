@@ -6,7 +6,7 @@ export const EmailDataSchema = z.object({
   title: z.string(),
   content: z.string(),
   category: z.string(),
-  date: z.string().datetime(),
+  date: z.string(),
   embedding: z.array(z.number()),
 });
 
