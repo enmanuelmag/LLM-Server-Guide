@@ -2,37 +2,41 @@ import OpenAI from 'openai';
 import { config } from '../config/index';
 import { Logger } from '../utils/logger';
 
-export interface ModerationResult {
-  flagged: boolean;
-  categories: {
-    harassment: boolean;
-    'harassment/threatening': boolean;
-    hate: boolean;
-    'hate/threatening': boolean;
-    'self-harm': boolean;
-    'self-harm/intent': boolean;
-    'self-harm/instructions': boolean;
-    sexual: boolean;
-    'sexual/minors': boolean;
-    violence: boolean;
-    'violence/graphic': boolean;
-  };
-  category_scores: {
-    harassment: number;
-    'harassment/threatening': number;
-    hate: number;
-    'hate/threatening': number;
-    'self-harm': number;
-    'self-harm/intent': number;
-    'self-harm/instructions': number;
-    sexual: number;
-    'sexual/minors': number;
-    violence: number;
-    'violence/graphic': number;
-  };
-  flagged_categories: string[];
-  highest_scores: { category: string; score: number }[];
-}
+
+import z from 'zod';
+
+export const ModerationResultSchema = z.object({
+  flagged: z.boolean(),
+  categories: z.object({
+    harassment: z.boolean(),
+    'harassment/threatening': z.boolean(),
+    hate: z.boolean(),
+    'hate/threatening': z.boolean(),
+    'self-harm': z.boolean(),
+    'self-harm/intent': z.boolean(),
+    'self-harm/instructions': z.boolean(),
+    sexual: z.boolean(),
+    'sexual/minors': z.boolean(),
+    violence: z.boolean(),
+    'violence/graphic': z.boolean(),
+  }),
+  category_scores: z.object({
+    harassment: z.number(),
+    'harassment/threatening': z.number(),
+    hate: z.number(),
+    'hate/threatening': z.number(),
+    'self-harm': z.number(),
+    'self-harm/intent': z.number(),
+    'self-harm/instructions': z.number(),
+    sexual: z.number(),
+    'sexual/minors': z.number(),
+    violence: z.number(),
+    'violence/graphic': z.number(),
+  }),
+  flagged_categories: z.array(z.string()),
+  highest_scores: z.array(z.object({ category: z.string(), score: z.number() })),
+});
+export type ModerationResult = z.infer<typeof ModerationResultSchema>;
 
 export class ModerationService {
   private openai: OpenAI;
