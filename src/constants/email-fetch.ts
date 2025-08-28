@@ -15,42 +15,58 @@ REGLAS:
 
 Analiza la consulta del usuario **siguiendo estas instrucciones**:
 
-### Identifica estos criterios de búsqueda:
-- **Remitente específico**: Emails de personas o empresas particulares (ej: "Netflix", "Amazon", "juan@empresa.com")
-- **Palabras clave en asunto**: Términos específicos que deben aparecer en el subject del email
-- **Rango de fechas**: Períodos específicos cuando ocurrieron las transacciones
-- **Categorías de gastos**: 
-  - comestibles: Supermercados, comida, restaurantes
-  - entretenimiento: Netflix, Spotify, cines, streaming
-  - electrónicos: Amazon, gadgets, tecnología
-  - suscripciones: Servicios mensuales recurrentes
-  - bancos: Comunicaciones bancarias, transferencias
-  - promociones: Ofertas, descuentos, cupones
-- **Montos específicos**: Rangos de valores o cantidades exactas
+### Identifica ÚNICAMENTE estos criterios de búsqueda disponibles:
+
+1. **sender** (opcional): Email completo del remitente
+   - Ejemplos: "netflix@netflix.com", "billing@amazon.com", "no-reply@spotify.com"
+   - Si el usuario menciona una empresa, convierte a formato de email (ej: "Netflix" → "netflix@netflix.com")
+
+2. **subject** (opcional): Texto a buscar en el asunto del email
+   - Usa palabras clave relevantes que podrían aparecer en el subject
+   - Ejemplos: "subscription", "payment", "receipt", "invoice", "billing"
+
+3. **dateRange** (opcional): Rango de fechas para la búsqueda
+   - Objeto con start y end en formato ISO
+   - Ejemplos de períodos comunes:
+     - "último mes": últimos 30 días
+     - "este año": desde enero hasta hoy
+     - "ayer": desde ayer 00:00 hasta 23:59
 
 ### Mapeo de consultas comunes:
-- "Gastos de Netflix" → remitente: "netflix.com", categoría: entretenimiento
-- "Compras de Amazon" → remitente: "amazon.com", categoría: electrónicos
-- "Facturas del mes pasado" → dateRange: último mes
-- "Gastos mayores a $100" → filtro por monto
-- "Emails de mi banco" → categoría: bancos
+- "Gastos de Netflix" → sender: "netflix@netflix.com", subject: "subscription"
+- "Compras de Amazon" → sender: "billing@amazon.com", subject: "order"
+- "Facturas del mes pasado" → dateRange: último mes, subject: "invoice"
+- "Emails de Spotify" → sender: "no-reply@spotify.com"
+- "Recibos de pago" → subject: "receipt"
 
 ---
 ## Ejecución de Búsqueda
 
 Una vez identificados los criterios, **DEBES** usar la función search-emails con:
 
-- **sender**: Email del remitente (requerido). Si no hay remitente específico, usa un patrón general como "@gmail.com" o "@empresa.com"
-- **subject**: Palabras clave para buscar en el asunto (requerido). Si no hay términos específicos, usa términos genéricos como "factura" o "receipt"
-- **dateRange**: Objeto con start y end en formato ISO (requerido):
-  - Para "último mes": desde hace 30 días hasta hoy
-  - Para "este año": desde enero hasta hoy
-  - Para "ayer": desde ayer 00:00 hasta 23:59
-  - Por defecto: últimos 30 días
+**PARÁMETROS DISPONIBLES (todos opcionales):**
+
+- **sender**: Email completo del remitente (opcional)
+  - Solo incluir si hay un remitente específico identificado
+  - Formato: "email@dominio.com"
+
+- **subject**: Palabras clave para buscar en el asunto (opcional)
+  - Solo incluir si hay términos específicos identificados
+  - Ejemplos: "subscription", "payment", "invoice", "receipt"
+
+- **dateRange**: Objeto con start y end en formato ISO (opcional)
+  - Solo incluir si hay un período específico mencionado
+  - Formato: { "start": "2025-07-28T00:00:00Z", "end": "2025-08-28T23:59:59Z" }
+  - Rangos comunes:
+    - "último mes": desde hace 30 días hasta hoy
+    - "este año": desde enero hasta hoy
+    - "ayer": desde ayer 00:00 hasta 23:59
+
+**IMPORTANTE**: No inventes parámetros. Solo usa los que están disponibles y solo si están claramente identificados en la consulta del usuario.
 
 EJEMPLO DE LLAMADA A FUNCIÓN:
 {
-  "sender": "netflix.com",
+  "sender": "netflix@netflix.com",
   "subject": "subscription",
   "dateRange": {
     "start": "2025-07-28T00:00:00Z",

@@ -117,19 +117,18 @@ export class LMService {
         type: 'function' as const,
         function: {
           name: 'search-emails',
-          description:
-            'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
+          description: 'Buscar emails en la base de datos usando remitente, asunto y rango de fechas',
           parameters: {
             type: 'object',
             properties: {
               sender: {
                 type: 'string',
                 format: 'email',
-                description: 'Email del remitente específico',
+                description: 'Email completo del remitente',
               },
               subject: {
                 type: 'string',
-                description: 'Texto a buscar en el asunto del email',
+                description: 'Texto a buscar en el asunto (contains)',
               },
               dateRange: {
                 type: 'object',
@@ -148,7 +147,7 @@ export class LMService {
                 description: 'Rango de fechas para la búsqueda',
               },
             },
-            required: ['sender', 'subject', 'dateRange'],
+            required: [],
           },
         },
       },
