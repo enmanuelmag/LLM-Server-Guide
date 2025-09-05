@@ -9,12 +9,16 @@ export const SaveEmailResponseSchema = z.object({
 
 export type SaveEmailResponse = z.infer<typeof SaveEmailResponseSchema>;
 
-// Generic database interface
-
+// Generic database schema
 export const GenericDBSchema = z.object({
-  saveEmail: z.function().args(z.unknown()).returns(z.promise(SaveEmailResponseSchema)),
+  saveEmail: z.function()
+    .args(z.unknown())
+    .returns(z.promise(SaveEmailResponseSchema)),
 });
-export type GenericDB = z.infer<typeof GenericDBSchema>;
+
+export type GenericDB = {
+  saveEmail(data: unknown): Promise<SaveEmailResponse>;
+};
 
 export class GenericDBService implements GenericDB {
   async saveEmail(data: unknown): Promise<SaveEmailResponse> {
