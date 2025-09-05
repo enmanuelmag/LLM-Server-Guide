@@ -1,16 +1,18 @@
-// Email Data Vector Store Interface
+import { z } from 'zod';
 
-import z from 'zod';
-
-export const RagEmailDataSchema = z.object({
+// Base vector item schema
+export const VectorItemSchema = z.object({
   id: z.string(),
   title: z.string(),
   content: z.string(),
   category: z.string(),
-  date: z.string(),
+  date: z.string().datetime(),
+});
+
+// Vector item with embedding schema
+export const VectorEmbedItemSchema = VectorItemSchema.extend({
   embedding: z.array(z.number()),
 });
-export type EmailData = z.infer<typeof RagEmailDataSchema>;
 
 export const VectorStoreQuerySchema = z.object({
   query: z.string(),
@@ -18,10 +20,13 @@ export const VectorStoreQuerySchema = z.object({
   limit: z.number().optional(),
   threshold: z.number().optional(),
 });
-export type VectorStoreQuery = z.infer<typeof VectorStoreQuerySchema>;
 
 export const VectorSearchResultSchema = z.object({
-  email: RagEmailDataSchema,
+  item: VectorEmbedItemSchema,
   similarity: z.number(),
 });
+
+export type VectorItem = z.infer<typeof VectorItemSchema>;
+export type VectorEmbedItem = z.infer<typeof VectorEmbedItemSchema>;
+export type VectorStoreQuery = z.infer<typeof VectorStoreQuerySchema>;
 export type VectorSearchResult = z.infer<typeof VectorSearchResultSchema>;
