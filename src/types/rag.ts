@@ -1,12 +1,16 @@
 import { z } from 'zod';
 
-// Email Data Vector Store Schema
-export const EmailDataSchema = z.object({
+// Base vector item schema
+export const VectorItemSchema = z.object({
   id: z.string(),
   title: z.string(),
   content: z.string(),
   category: z.string(),
   date: z.string().datetime(),
+});
+
+// Vector item with embedding schema
+export const VectorEmbedItemSchema = VectorItemSchema.extend({
   embedding: z.array(z.number()),
 });
 
@@ -18,10 +22,11 @@ export const VectorStoreQuerySchema = z.object({
 });
 
 export const VectorSearchResultSchema = z.object({
-  email: EmailDataSchema,
+  item: VectorEmbedItemSchema,
   similarity: z.number(),
 });
 
-export type EmailData = z.infer<typeof EmailDataSchema>;
+export type VectorItem = z.infer<typeof VectorItemSchema>;
+export type VectorEmbedItem = z.infer<typeof VectorEmbedItemSchema>;
 export type VectorStoreQuery = z.infer<typeof VectorStoreQuerySchema>;
 export type VectorSearchResult = z.infer<typeof VectorSearchResultSchema>;
