@@ -1,5 +1,4 @@
-
-import z from 'zod';
+import { z } from 'zod';
 
 export const FineTuningDataPointSchema = z.object({
   messages: z.array(z.object({
@@ -7,14 +6,12 @@ export const FineTuningDataPointSchema = z.object({
     content: z.string(),
   })),
 });
-export type FineTuningDataPoint = z.infer<typeof FineTuningDataPointSchema>;
 
 export const EmailClassificationRequestSchema = z.object({
   emailSubject: z.string(),
   emailBody: z.string(),
   sender: z.string().optional(),
 });
-export type EmailClassificationRequest = z.infer<typeof EmailClassificationRequestSchema>;
 
 export const EmailClassificationResultSchema = z.object({
   isFinancial: z.boolean(),
@@ -26,7 +23,6 @@ export const EmailClassificationResultSchema = z.object({
     currency: z.string(),
   }).optional(),
 });
-export type EmailClassificationResult = z.infer<typeof EmailClassificationResultSchema>;
 
 export const FineTuningStatsSchema = z.object({
   totalTrainingExamples: z.number(),
@@ -34,4 +30,8 @@ export const FineTuningStatsSchema = z.object({
   fineTunedAccuracy: z.number(),
   improvementPercentage: z.number(),
 });
+
+export type FineTuningDataPoint = z.infer<typeof FineTuningDataPointSchema>;
+export type EmailClassificationRequest = z.infer<typeof EmailClassificationRequestSchema>;
+export type EmailClassificationResult = z.infer<typeof EmailClassificationResultSchema>;
 export type FineTuningStats = z.infer<typeof FineTuningStatsSchema>;

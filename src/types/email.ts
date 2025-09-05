@@ -47,25 +47,3 @@ export const EmailSenderSchema = z.object({
 
 export type EmailData = z.infer<typeof EmailDataSchema>;
 export type EmailSender = z.infer<typeof EmailSenderSchema>;
-
-// Schema for financial data extracted from emails (used by GenericDB)
-export const EmailFinancialDataSchema = z.object({
-  id: z.string().describe('Unique identifier for the email'),
-  confidence: z.number().min(0).max(1).describe('Confidence level for financial transaction classification'),
-  subject: z.string().describe('Subject of the email'),
-  name: z.string().max(30).describe('Name of the transaction, max 30 characters'),
-  sender: z.object({
-    name: z.string().describe('Name of the sender'),
-    email: z.string().email().describe('Email address of the sender')
-  }),
-  date: z.string().datetime().describe('Date of the transaction in ISO format with time zone'),
-  body: z.string().min(1).describe('Email body content, cannot be empty'),
-  description: z.string().max(300).describe('Brief description of the transaction, max 300 chars'),
-  type: z.enum(['income', 'expense']).describe('Type of financial transaction'),
-  amount: z.object({
-    value: z.number().describe('Amount value'),
-    currency: z.string().describe('Currency of the amount')
-  })
-});
-
-export type EmailFinancialData = z.infer<typeof EmailFinancialDataSchema>;

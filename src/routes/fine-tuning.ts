@@ -5,7 +5,6 @@ const router = Router();
 
 // Fine-tuning functionality has been removed as part of cleanup
 // These endpoints now return deprecation notices
-
 router.post('/classify-base', async (req, res) => {
   res.status(410).json({
     error: 'Fine-tuning functionality has been deprecated',
@@ -42,3 +41,4 @@ router.get('/dataset', (req, res) => {
 });
 
 export default router;
+
