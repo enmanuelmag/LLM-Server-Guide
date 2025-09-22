@@ -6,7 +6,8 @@
 
 import { z } from 'zod';
 import { Logger } from '../utils/logger';
-import { LMService, ChatMessage } from './LMService';
+import { LMService } from './LMService';
+import { ChatMessage } from '../types/chat';
 import { EMAIL_FETCH_PROMPT } from '../constants/email-fetch';
 
 export const EmailFetchRequestSchema = z.object({
