@@ -1,6 +1,5 @@
 import OpenAI from 'openai';
 import { VectorStoreService } from '../services/VectorStoreService';
-import { VectorItem } from '../types/rag';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
@@ -8,11 +7,11 @@ export class RAGService {
   private openai: OpenAI;
   private vectorStore: VectorStoreService;
 
-  constructor(items: VectorItem[]) {
+  constructor() {
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
-    this.vectorStore = new VectorStoreService(items);
+    this.vectorStore = new VectorStoreService();
   }
 
   /**
@@ -29,7 +28,7 @@ export class RAGService {
    */
   async answerQuery(query: string): Promise<{
     answer: string;
-    relevantItems: Array<{
+    relevantEmails: Array<{
       title: string;
       similarity: number;
     }>;
@@ -37,66 +36,58 @@ export class RAGService {
   }> {
     Logger.info('💭 Processing RAG query:', query);
 
-    // 1. Search for relevant items
-    const searchResults = await this.vectorStore.searchSimilar(query, 3, 0.5);
+    // 1. Search for relevant emails
+    const searchResults = await this.vectorStore.searchSimilar(query, 3, 0.6);
 
     if (searchResults.length === 0) {
-      Logger.warn('⚠️ No relevant items found for query');
+      Logger.warn('⚠️ No relevant emails found for query');
       return {
-        answer:
-          'Lo siento, no encontré información relevante para tu consulta. ¿Podrías reformular la pregunta?',
-        relevantItems: [],
-        tokensUsed: 0,
+        answer: 'Lo siento, no encontré emails relevantes para tu consulta. ¿Podrías reformular la pregunta?',
+        relevantEmails: [],
+        tokensUsed: 0
       };
     }
 
-    // 2. Build context from relevant items
-    const itemsContext = searchResults
-      .map(
-        (result) =>
-          `**${result.item.title}** (Relevancia: ${(
-            result.similarity * 100
-          ).toFixed(1)}%)\n${result.item.content}`
-      )
+    // 2. Build context from relevant emails
+    const emailsContext = searchResults
+      .map(result => `**${result.email.title}** (Relevancia: ${(result.similarity * 100).toFixed(1)}%)\n${result.email.content}`)
       .join('\n\n---\n\n');
 
     // 3. Generate contextualized response
-    const systemPrompt = `Eres un asistente experto en análisis de información corporativa. Tu trabajo es responder consultas basándote ÚNICAMENTE en la información proporcionada.
+    const systemPrompt = `Eres un asistente experto en análisis de emails financieros. Tu trabajo es responder consultas basándote ÚNICAMENTE en los emails proporcionados.
 
 INSTRUCCIONES:
 1. Responde de forma clara y práctica
-2. Cita las fuentes relevantes cuando sea apropiado
-3. Si la consulta no está cubierta por la información, dílo claramente
+2. Cita los emails relevantes cuando sea apropiado
+3. Si la consulta no está cubierta por los emails, dílo claramente
 4. Mantén un tono profesional pero amigable
 5. Incluye números específicos y fechas cuando sea relevante
 
-INFORMACIÓN RELEVANTE:
-${itemsContext}`;
+EMAILS RELEVANTES:
+${emailsContext}`;
 
     const completion = await this.openai.chat.completions.create({
       model: config.openai.model,
       messages: [
         { role: 'system', content: systemPrompt },
-        { role: 'user', content: query },
+        { role: 'user', content: query }
       ],
       temperature: 0.3, // Low temperature for consistent, factual responses
-      max_tokens: 500,
+      max_tokens: 500
     });
 
-    const answer =
-      completion.choices[0].message.content ||
-      'No se pudo generar una respuesta.';
+    const answer = completion.choices[0].message.content || 'No se pudo generar una respuesta.';
     const tokensUsed = completion.usage?.total_tokens || 0;
 
     Logger.success(`✅ RAG query processed (${tokensUsed} tokens used)`);
 
     return {
       answer,
-      relevantItems: searchResults.map((result) => ({
-        title: result.item.title,
-        similarity: result.similarity,
+      relevantEmails: searchResults.map(result => ({
+        title: result.email.title,
+        similarity: result.similarity
       })),
-      tokensUsed,
+      tokensUsed
     };
   }
 

@@ -1,52 +1,44 @@
 import OpenAI from 'openai';
-import {
-  VectorItem,
-  VectorEmbedItem,
-  VectorStoreQuery,
-  VectorSearchResult,
-} from '../types/rag';
+import { EmailData, VectorStoreQuery, VectorSearchResult } from '../types/rag';
+import { EMAIL_DATABASE } from '../data/email-mock-data';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class VectorStoreService {
   private openai: OpenAI;
-  private items: VectorEmbedItem[] = [];
+  private emails: EmailData[] = [];
   private isInitialized = false;
-  private sourceItems: VectorItem[];
 
-  constructor(items: VectorItem[]) {
+  constructor() {
     this.openai = new OpenAI({
       apiKey: config.openai.apiKey,
     });
-    this.sourceItems = items;
   }
 
   /**
-   * Initialize vector store by creating embeddings for all items
+   * Initialize vector store by creating embeddings for all emails
    * En producción, esto se haría offline y se guardaría en una DB vectorial
    */
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
 
-    Logger.info('🔄 Initializing vector store with provided items...');
-
+    Logger.info('🔄 Initializing vector store with email database...');
+    
     try {
-      const itemsWithEmbeddings = await Promise.all(
-        this.sourceItems.map(async (item) => {
-          const embedding = await this.createEmbedding(item.content);
+      const emailsWithEmbeddings = await Promise.all(
+        EMAIL_DATABASE.map(async (email) => {
+          const embedding = await this.createEmbedding(email.content);
           return {
-            ...item,
-            embedding,
-          } as VectorEmbedItem;
+            ...email,
+            embedding
+          };
         })
       );
 
-      this.items = itemsWithEmbeddings;
+      this.emails = emailsWithEmbeddings;
       this.isInitialized = true;
-
-      Logger.success(
-        `✅ Vector store initialized with ${this.items.length} items`
-      );
+      
+      Logger.success(`✅ Vector store initialized with ${this.emails.length} emails`);
     } catch (error) {
       Logger.error('❌ Failed to initialize vector store:', error);
       throw error;
@@ -66,13 +58,9 @@ export class VectorStoreService {
   }
 
   /**
-   * Search for similar items based on query
+   * Search for similar emails based on query
    */
-  async searchSimilar(
-    query: string,
-    limit: number = 3,
-    threshold: number = 0.7
-  ): Promise<VectorSearchResult[]> {
+  async searchSimilar(query: string, limit: number = 3, threshold: number = 0.7): Promise<VectorSearchResult[]> {
     if (!this.isInitialized) {
       await this.initialize();
     }
@@ -82,21 +70,19 @@ export class VectorStoreService {
     // Create embedding for the query
     const queryEmbedding = await this.createEmbedding(query);
 
-    // Calculate similarity with all items
-    const similarities = this.items.map((item) => ({
-      item,
-      similarity: this.cosineSimilarity(queryEmbedding, item.embedding),
+    // Calculate similarity with all emails
+    const similarities = this.emails.map((email) => ({
+      email,
+      similarity: this.cosineSimilarity(queryEmbedding, email.embedding)
     }));
 
     // Filter by threshold and sort by similarity
     const results = similarities
-      .filter((result) => result.similarity >= threshold)
+      .filter(result => result.similarity >= threshold)
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, limit);
 
-    Logger.debug(
-      `📊 Found ${results.length} relevant items (threshold: ${threshold})`
-    );
+    Logger.debug(`📊 Found ${results.length} relevant emails (threshold: ${threshold})`);
 
     return results;
   }
@@ -121,16 +107,16 @@ export class VectorStoreService {
   }
 
   /**
-   * Get all items (for debugging)
+   * Get all emails (for debugging)
    */
-  getAllItems(): VectorEmbedItem[] {
-    return this.items;
+  getAllEmails(): EmailData[] {
+    return this.emails;
   }
 
   /**
-   * Get item by ID
+   * Get email by ID
    */
-  getItemById(id: string): VectorEmbedItem | undefined {
-    return this.items.find((item) => item.id === id);
+  getEmailById(id: string): EmailData | undefined {
+    return this.emails.find(email => email.id === id);
   }
 }

@@ -1,4 +1,4 @@
-import { VectorItem } from '../types/rag';
+import { EmailData } from '../types/rag';
 
 /**
  * Base de Datos de Emails Simulados para Pruebas RAG
@@ -6,7 +6,7 @@ import { VectorItem } from '../types/rag';
  * Diseñados en español para ser claros y no ambiguos para mejores resultados de RAG
  * Los embeddings de OpenAI funcionan perfectamente con contenido en español
  */
-export const EMAIL_DATABASE: VectorItem[] = [
+export const EMAIL_DATABASE: Omit<EmailData, 'embedding'>[] = [
   {
     id: 'amazon-receipt-001',
     title: 'Amazon - Recibo de Compra MacBook Pro',
