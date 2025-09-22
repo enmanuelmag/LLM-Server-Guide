@@ -29,6 +29,22 @@ export const AIDetectedEventSchema = z.object({
 
 export type AIDetectedEventType = z.infer<typeof AIDetectedEventSchema>;
 
+// Email Financial Data Schema for database operations
+export const EmailFinancialDataSchema = z.object({
+  id: z.string(),
+  subject: z.string(),
+  body: z.string().optional(),
+  amount: z.object({
+    value: z.number(),
+    currency: z.string(),
+  }),
+  type: z.enum(['income', 'expense']),
+  detectedDate: z.number(),
+  status: z.enum(['pending', 'approved', 'rejected']),
+});
+
+export type EmailFinancialData = z.infer<typeof EmailFinancialDataSchema>;
+
 // Email types for simulation - converted to Zod schemas
 export const EmailDataSchema = z.object({
   id: z.string(),
