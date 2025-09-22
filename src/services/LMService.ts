@@ -1,5 +1,8 @@
 import OpenAI from 'openai';
 import { ChatMessage, ChatCompletionResponse } from '../types/chat';
+
+// Export ChatMessage for use by other services
+export { ChatMessage };
 import { GenericDBService } from './GenericDBService';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
