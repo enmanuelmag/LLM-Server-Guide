@@ -26,6 +26,16 @@ export const VectorSearchResultSchema = z.object({
   similarity: z.number(),
 });
 
+// Email-specific schemas for backwards compatibility
+export const EmailDataSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  content: z.string(),
+  date: z.string(),
+  category: z.string(),
+});
+
+export type EmailData = z.infer<typeof EmailDataSchema>;
 export type VectorItem = z.infer<typeof VectorItemSchema>;
 export type VectorEmbedItem = z.infer<typeof VectorEmbedItemSchema>;
 export type VectorStoreQuery = z.infer<typeof VectorStoreQuerySchema>;

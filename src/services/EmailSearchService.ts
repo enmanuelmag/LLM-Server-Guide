@@ -28,21 +28,23 @@ export class EmailSearchService {
     let filteredEmails = [...this.emails];
 
     // Filter by sender
-    if (params.sender) {
+    if (params.senders && params.senders.length > 0) {
       filteredEmails = filteredEmails.filter(
         (email) =>
-          email.title.toLowerCase().includes(params.sender!.toLowerCase()) ||
-          email.content.toLowerCase().includes(params.sender!.toLowerCase())
+          params.senders!.some(sender => 
+            email.title.toLowerCase().includes(sender.toLowerCase()) ||
+            email.content.toLowerCase().includes(sender.toLowerCase())
+          )
       );
       Logger.debug(
-        `📧 Filtered by sender: ${filteredEmails.length} emails remaining`
+        `📧 Filtered by senders: ${filteredEmails.length} emails remaining`
       );
     }
 
     // Filter by date range
     if (params.dateRange) {
-      const startDate = new Date(params.dateRange.start);
-      const endDate = new Date(params.dateRange.end);
+      const startDate = new Date(params.dateRange.from);
+      const endDate = new Date(params.dateRange.to);
 
       filteredEmails = filteredEmails.filter((email) => {
         const emailDate = new Date(email.date);
@@ -59,7 +61,7 @@ export class EmailSearchService {
 
     return {
       emails: filteredEmails,
-      totalEmails: filteredEmails.length,
+      summary: `Found ${filteredEmails.length} emails matching criteria`,
       searchParams: params,
     };
   }

@@ -1,12 +1,12 @@
 import OpenAI from 'openai';
-import { EmailData, VectorStoreQuery, VectorSearchResult } from '../types/rag';
+import { EmailData, VectorStoreQuery, VectorSearchResult, VectorEmbedItem } from '../types/rag';
 import { EMAIL_DATABASE } from '../data/email-mock-data';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class VectorStoreService {
   private openai: OpenAI;
-  private emails: EmailData[] = [];
+  private emails: VectorEmbedItem[] = [];
   private isInitialized = false;
 
   constructor() {
@@ -29,7 +29,11 @@ export class VectorStoreService {
         EMAIL_DATABASE.map(async (email) => {
           const embedding = await this.createEmbedding(email.content);
           return {
-            ...email,
+            id: email.id,
+            title: email.title,
+            content: email.content,
+            category: email.category,
+            date: email.date,
             embedding
           };
         })
@@ -72,7 +76,7 @@ export class VectorStoreService {
 
     // Calculate similarity with all emails
     const similarities = this.emails.map((email) => ({
-      email,
+      item: email,
       similarity: this.cosineSimilarity(queryEmbedding, email.embedding)
     }));
 
@@ -109,14 +113,14 @@ export class VectorStoreService {
   /**
    * Get all emails (for debugging)
    */
-  getAllEmails(): EmailData[] {
+  getAllEmails(): VectorEmbedItem[] {
     return this.emails;
   }
 
   /**
    * Get email by ID
    */
-  getEmailById(id: string): EmailData | undefined {
+  getEmailById(id: string): VectorEmbedItem | undefined {
     return this.emails.find(email => email.id === id);
   }
 }

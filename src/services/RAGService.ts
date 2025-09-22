@@ -50,7 +50,7 @@ export class RAGService {
 
     // 2. Build context from relevant emails
     const emailsContext = searchResults
-      .map(result => `**${result.email.title}** (Relevancia: ${(result.similarity * 100).toFixed(1)}%)\n${result.email.content}`)
+      .map(result => `**${result.item.title}** (Relevancia: ${(result.similarity * 100).toFixed(1)}%)\n${result.item.content}`)
       .join('\n\n---\n\n');
 
     // 3. Generate contextualized response
@@ -84,7 +84,7 @@ ${emailsContext}`;
     return {
       answer,
       relevantEmails: searchResults.map(result => ({
-        title: result.email.title,
+        title: result.item.title,
         similarity: result.similarity
       })),
       tokensUsed

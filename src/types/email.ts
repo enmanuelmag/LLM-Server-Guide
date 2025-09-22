@@ -45,5 +45,26 @@ export const EmailSenderSchema = z.object({
   type: z.enum(['bank', 'vendor', 'subscription', 'other']),
 });
 
+// Schema for email financial data (used in GenericDBService)
+export const EmailFinancialDataSchema = z.object({
+  id: z.string(),
+  confidence: z.number().min(0).max(1),
+  subject: z.string(),
+  name: z.string().max(30),
+  sender: z.object({
+    name: z.string(),
+    email: z.string().email(),
+  }),
+  date: z.string().datetime(),
+  body: z.string().min(1),
+  description: z.string().max(300),
+  type: z.enum(['income', 'expense']),
+  amount: z.object({
+    value: z.number(),
+    currency: z.string(),
+  }),
+});
+
 export type EmailData = z.infer<typeof EmailDataSchema>;
 export type EmailSender = z.infer<typeof EmailSenderSchema>;
+export type EmailFinancialData = z.infer<typeof EmailFinancialDataSchema>;
