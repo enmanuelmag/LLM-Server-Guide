@@ -23,8 +23,8 @@ router.post('/search', async (req: Request, res: Response) => {
         error: 'Query is required and must be a string',
         example: {
           query: 'Busca todos los emails de Netflix del mes pasado',
-          context: 'Necesito revisar mis gastos de entretenimiento'
-        }
+          context: 'Necesito revisar mis gastos de entretenimiento',
+        },
       });
     }
 
@@ -32,7 +32,7 @@ router.post('/search', async (req: Request, res: Response) => {
 
     const result = await emailFetchService.fetchEmails({
       userQuery: query,
-      context
+      context,
     });
 
     if (result.success) {
@@ -41,74 +41,28 @@ router.post('/search', async (req: Request, res: Response) => {
         message: result.response,
         data: {
           emailsFound: result.emailsFound,
-          totalAmount: result.totalAmount
+          totalAmount: result.totalAmount,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } else {
       res.status(500).json({
         success: false,
         error: result.error,
         message: result.response,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-
   } catch (error) {
     Logger.error('❌ Error in email search endpoint:', error);
-    
+
     res.status(500).json({
       success: false,
       error: 'Internal server error',
       message: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
-});
-
-/**
- * GET /categories
- * Get available email categories for search
- */
-router.get('/categories', (req: Request, res: Response) => {
-  const categories = [
-    {
-      name: 'comestibles',
-      description: 'Gastos en comida y supermercados',
-      examples: ['walmart', 'grocery', 'food']
-    },
-    {
-      name: 'entretenimiento', 
-      description: 'Servicios de streaming y entretenimiento',
-      examples: ['netflix', 'spotify', 'entertainment']
-    },
-    {
-      name: 'electrónicos',
-      description: 'Compras de tecnología y gadgets',
-      examples: ['amazon', 'electronics', 'tech']
-    },
-    {
-      name: 'suscripciones',
-      description: 'Servicios mensuales recurrentes',
-      examples: ['netflix', 'spotify', 'monthly']
-    },
-    {
-      name: 'bancos',
-      description: 'Comunicaciones bancarias',
-      examples: ['chase', 'santander', 'bbva']
-    },
-    {
-      name: 'promociones',
-      description: 'Ofertas y descuentos',
-      examples: ['discount', 'offer', 'deal']
-    }
-  ];
-
-  res.json({
-    categories,
-    totalCategories: categories.length,
-    usage: 'Include category names in your search query, e.g., "busca emails de entretenimiento"'
-  });
 });
 
 /**
@@ -119,30 +73,30 @@ router.get('/examples', (req: Request, res: Response) => {
   const examples = [
     {
       query: 'Busca todos los emails de Netflix',
-      description: 'Encontrar emails de un remitente específico'
+      description: 'Encontrar emails de un remitente específico',
     },
     {
       query: 'Muéstrame gastos de entretenimiento mayores a $10',
-      description: 'Búsqueda por categoría y monto mínimo'
+      description: 'Búsqueda por categoría y monto mínimo',
     },
     {
       query: 'Emails de Amazon entre $50 y $200',
-      description: 'Búsqueda por remitente y rango de montos'
+      description: 'Búsqueda por remitente y rango de montos',
     },
     {
       query: 'Todos mis gastos en comestibles',
-      description: 'Búsqueda por categoría'
+      description: 'Búsqueda por categoría',
     },
     {
       query: 'Suscripciones mensuales que pago',
-      description: 'Búsqueda por tipo de servicio'
-    }
+      description: 'Búsqueda por tipo de servicio',
+    },
   ];
 
   res.json({
     examples,
     tip: 'Use natural language - the AI will understand and extract the right search criteria!',
-    totalExamples: examples.length
+    totalExamples: examples.length,
   });
 });
 
