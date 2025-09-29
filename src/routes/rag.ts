@@ -1,36 +1,9 @@
 import { Router } from 'express';
-import multer from 'multer';
-import fs from 'fs/promises';
-import { createReadStream } from 'fs';
 import { ragService } from '../app';
 import { config } from '../config';
 import { Logger } from '../utils/logger';
-import OpenAI from 'openai';
 
 const router = Router();
-const openai = new OpenAI({ apiKey: config.openai.apiKey });
-
-// Configure multer for audio file uploads
-const upload = multer({
-  dest: 'uploads/',
-  limits: {
-    fileSize: 25 * 1024 * 1024, // 25MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedMimes = [
-      'audio/mpeg',
-      'audio/wav',
-      'audio/mp4',
-      'audio/flac',
-      'audio/x-m4a',
-    ];
-    if (allowedMimes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only audio files are allowed.'));
-    }
-  },
-});
 
 // RAG query endpoint
 router.post('/query', async (req, res) => {
