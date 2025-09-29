@@ -1,30 +1,13 @@
-import OpenAI from 'openai';
-import {
-  EmailData,
-  AIDetectedEventType,
-  AIDetectedEventSchema,
-} from '../types/email';
+import { EmailData, AIDetectedEventType } from '../types/email';
 import { ChatMessage } from '../types/chat';
-import { EmailSimulationService } from './EmailSimulationService';
-import { RAGService } from './RAGService';
 import { LMService } from './LMService';
 import { EMAIL_PROCESSOR_PROMPT } from '../constants/email-processor';
-import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class EmailProcessorService {
-  private openai: OpenAI;
-  private emailSimulation: EmailSimulationService;
-  private ragService: RAGService;
   private lmService: LMService;
-  private processedEmails: Map<string, AIDetectedEventType> = new Map();
 
-  constructor(ragService: RAGService, lmService: LMService) {
-    this.openai = new OpenAI({
-      apiKey: config.openai.apiKey,
-    });
-    this.emailSimulation = new EmailSimulationService();
-    this.ragService = ragService;
+  constructor(lmService: LMService) {
     this.lmService = lmService;
   }
 

@@ -1,13 +1,11 @@
 import { Router } from 'express';
 import { EmailProcessorService } from '../services/EmailProcessorService';
-import { RAGService } from '../services/RAGService';
 import { LMService } from '../services/LMService';
 import { Logger } from '../utils/logger';
 
 const router = Router();
-const ragService = new RAGService();
 const lmService = new LMService();
-const emailProcessorService = new EmailProcessorService(ragService, lmService);
+const emailProcessorService = new EmailProcessorService(lmService);
 
 // Process a single email
 router.post('/process', async (req, res) => {
