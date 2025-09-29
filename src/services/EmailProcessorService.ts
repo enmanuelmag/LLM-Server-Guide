@@ -1,15 +1,7 @@
-import OpenAI from 'openai';
-import {
-  EmailData,
-  AIDetectedEventType,
-  AIDetectedEventSchema,
-} from '../types/email';
+import { EmailData, AIDetectedEventType } from '../types/email';
 import { ChatMessage } from '../types/chat';
-import { EmailSimulationService } from './EmailSimulationService';
-import { RAGService } from './RAGService';
 import { LMService } from './LMService';
 import { EMAIL_PROCESSOR_PROMPT } from '../constants/email-processor';
-import { config } from '../config';
 import { Logger } from '../utils/logger';
 
 export class EmailProcessorService {
