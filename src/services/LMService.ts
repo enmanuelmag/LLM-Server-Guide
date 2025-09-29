@@ -110,6 +110,43 @@ export class LMService {
           },
         },
       },
+      {
+        type: 'function' as const,
+        function: {
+          name: 'search-emails',
+          description:
+            'Busca emails basado en parámetros específicos como remitentes, subject, rango de fechas.',
+          parameters: {
+            type: 'object',
+            properties: {
+              senders: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Lista de remitentes de email',
+              },
+              subjects: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Palabras clave en el asunto del email',
+              },
+              dateRange: {
+                type: 'object',
+                properties: {
+                  from: {
+                    type: 'string',
+                    description: 'Fecha de inicio en formato YYYY-MM-DD',
+                  },
+                  to: {
+                    type: 'string',
+                    description: 'Fecha final en formato YYYY-MM-DD',
+                  },
+                },
+              },
+            },
+            required: ['senders', 'subjects', 'dateRange'],
+          },
+        },
+      },
     ];
 
     let maxRetries = 3;
@@ -183,7 +220,6 @@ export class LMService {
         };
         break;
       }
-
 
       // Process each tool call
       for (const toolCall of assistantMessage.tool_calls) {
